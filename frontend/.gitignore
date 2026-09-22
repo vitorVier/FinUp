@@ -33,3 +33,8 @@ Thumbs.db
 
 # --- Vercel (se um dia fizer deploy do front lá) ---
 .vercel
+.neon
+
+/generated/prisma
+
+/generated/prisma
