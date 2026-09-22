@@ -1,0 +1,6 @@
+LIQUIDEZ_MINIMA = 2_000_000
+DY_MINIMO = 0.08  # 8%
+DY_MAXIMO = 0.15  # 15%
+PVP_MINIMO = 0.80  # 80% do preço justo
+PVP_MAXIMO = 1.00  # 100% do preço justo
+VACANCIA_MAXIMA = 0.15  # 15%

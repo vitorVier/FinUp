@@ -1,0 +1,35 @@
+# --- Python / backend ---
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# dados e saídas geradas pelo backend
+backend/inputs/
+backend/output/
+
+# --- Node / frontend ---
+node_modules/
+.next/
+out/
+build/
+*.tsbuildinfo
+next-env.d.ts
+
+# variáveis de ambiente
+.env
+.env.local
+.env.*.local
+
+# --- Editor / SO ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Vercel (se um dia fizer deploy do front lá) ---
+.vercel
