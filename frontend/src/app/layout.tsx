@@ -1,5 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import { Providers } from "@/src/components/providers";
 
 export const metadata: Metadata = {
     title: "FII Fuzzy Ranking",
@@ -14,7 +15,7 @@ export default function RootLayout({
     return (
         <html lang="pt-BR">
             <body>
-                {children}
+                <Providers>{children}</Providers>
             </body>
         </html>
     );

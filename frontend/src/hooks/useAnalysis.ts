@@ -54,12 +54,23 @@ export function useAnalysis() {
                 ...opts,
             });
 
-            const body = await r.json();
-
+            // 1. PRIMEIRO verificamos se a resposta NÃO é válida (200-299)
             if (!r.ok) {
-                throw new Error(body?.detail || "Não foi possível executar a análise.");
+                // Tentamos ler como JSON se for um erro tratado do FastAPI, 
+                // senão lemos como texto puro para evitar o erro do "<"
+                const contentType = r.headers.get("content-type");
+                if (contentType && contentType.includes("application/json")) {
+                    const errorBody = await r.json();
+                    throw new Error(errorBody?.detail || "Não foi possível executar a análise.");
+                } else {
+                    const textError = await r.text();
+                    console.error("Servidor retornou uma resposta não-JSON:", textError);
+                    throw new Error(`Erro no servidor (Status ${r.status}). Verifique se o backend está rodando.`);
+                }
             }
 
+            // 2. Agora SIM temos a certeza absoluta que a resposta é um JSON com sucesso
+            const body = await r.json();
             const analise = body as Analysis;
             const agora = new Date().toISOString();
 

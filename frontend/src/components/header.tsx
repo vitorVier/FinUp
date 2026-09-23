@@ -1,6 +1,7 @@
 "use client";
 
-import { BarChart3, LineChartIcon, RefreshCw, WalletCards } from "lucide-react";
+import { BarChart3, LineChartIcon, LogOut, RefreshCw, WalletCards } from "lucide-react";
+import { signOut, useSession } from "next-auth/react"; // Importamos o useSession
 import { Button } from "./ui/button";
 
 export function NavigationHeader({
@@ -14,8 +15,12 @@ export function NavigationHeader({
   page: "analise" | "diagnostico";
   setPage: (page: "analise" | "diagnostico") => void;
 }) {
+  // Buscamos os dados do usuário logado de forma automática
+  const { data: session } = useSession();
+  const user = session?.user;
+
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background">
+    <header className="sticky top-0 z-40 border-b border-border bg-background px-5">
       <div className="mx-auto flex h-16 max-w-[1500px] items-center justify-between px-6">
         <div className="flex min-w-0 items-center gap-3">
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-primary text-primary-foreground">
@@ -60,18 +65,42 @@ export function NavigationHeader({
           </button>
         </nav>
 
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={run}
-          disabled={loading}
-          className="h-9 gap-2 px-2.5 text-xs text-slate-400 hover:text-foreground"
-        >
-          <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
-          <span className="hidden sm:inline">
-            {loading ? "Atualizando…" : "Atualizar dados"}
-          </span>
-        </Button>
+        <div className="flex items-center gap-1">
+          {/* Se o usuário ESTIVER logado, mostra a foto e o botão de Sair */}
+          {user ? (
+            <div className="ml-1 flex items-center gap-2 border-l border-border pl-3">
+              {user.image ? (
+                <img src={user.image} alt="" className="h-7 w-7 rounded-full" referrerPolicy="no-referrer" />
+              ) : (
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary text-[10px] font-bold">
+                  {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+                </div>
+              )}
+              <span className="hidden text-xs font-medium text-foreground max-w-[100px] truncate md:block">
+                {user.name}
+              </span>
+              <button
+                type="button"
+                onClick={() => signOut({ callbackUrl: "/" })}
+                title="Sair"
+                className="flex h-9 items-center gap-1.5 rounded px-2 text-xs text-slate-400 hover:text-foreground"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ) : (
+            /* Se o usuário NÃO estiver logado, mostra o botão de Entrar */
+            <div className="ml-1 border-l border-border pl-3">
+              <Button
+                size="sm"
+                onClick={() => window.location.href = "/login"} 
+                className="h-8 text-xs font-semibold px-4"
+              >
+                Entrar
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );
