@@ -16,7 +16,7 @@ const COLUMNS: { key: keyof Fund | "actions"; label: string; className: string }
   { key: "P/VP", label: "P/VP", className: "px-5" },
   { key: "Nota_Final", label: "Nota", className: "px-4" },
   { key: "Recomendacao", label: "Recomendação", className: "px-4" },
-  { key: "actions", label: "", className: "px-6" },
+  { key: "actions", label: "Ações", className: "px-6 text-right" },
 ];
 
 export function RankingTable({ funds, onSelect }: { funds: Fund[]; onSelect: (f: Fund) => void }) {
@@ -131,13 +131,13 @@ export function RankingTable({ funds, onSelect }: { funds: Fund[]; onSelect: (f:
 
   return (
     <div className="w-full overflow-hidden rounded border border-border bg-card">
-      <div className="flex flex-col gap-3 border-b border-border p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-border p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
         <div className="relative w-full sm:max-w-xs">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <Input className="w-full pl-9" placeholder="Buscar papel…" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
 
-        <div className="flex w-full items-center gap-2 sm:w-auto sm:shrink-0">
+        <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto sm:shrink-0 sm:flex-nowrap">
           <Select value={seg} onValueChange={setSeg}>
             <SelectTrigger className="min-w-0 flex-1 sm:w-[180px] pr-8">
               <div className="flex min-w-0 items-center gap-2">
@@ -187,11 +187,18 @@ export function RankingTable({ funds, onSelect }: { funds: Fund[]; onSelect: (f:
               {COLUMNS.map(({ key, label, className }) => (
                 <th key={key} className={`whitespace-nowrap py-3 ${className}`}>
                   {key !== "actions" ? (
-                    <button className="inline-flex items-center gap-1 font-semibold" onClick={() => toggle(key as keyof Fund)}>
-                      {label}
-                      <ArrowUpDown className="h-3 w-3" />
+                    <button
+                        className="inline-flex items-center gap-1 font-semibold"
+                        onClick={() => toggle(key as keyof Fund)}
+                    >
+                        {label}
+                        <ArrowUpDown className="h-3 w-3" />
                     </button>
-                  ) : null}
+                ) : (
+                    <span className="font-semibold">
+                        {label}
+                    </span>
+                )}
                 </th>
               ))}
             </tr>
@@ -289,7 +296,7 @@ export function RankingTable({ funds, onSelect }: { funds: Fund[]; onSelect: (f:
         </table>
       </div>
 
-      <div className="border-t border-border px-4 py-3 text-xs text-slate-400">
+      <div className="border-t border-border px-5 py-4 text-xs text-slate-400 sm:px-6">
         {filtered.length} de {funds.length} fundos exibidos
       </div>
     </div>

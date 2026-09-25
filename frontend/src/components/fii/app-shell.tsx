@@ -42,7 +42,7 @@ export function AppShell() {
 
   return (
     <div className="min-h-screen">
-      <main className="mx-auto max-w-[1500px] px-6 py-8">
+      <main className="mx-auto max-w-[1500px] px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
         {error && (
           <div className="mb-6 rounded border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
             {error}
@@ -55,7 +55,7 @@ export function AppShell() {
           <EmptyState loading={loading} onRefresh={() => run("/analysis/run")} onUpload={upload} />
         ) : page === "analise" ? (
           <>
-            <div className="mb-8 flex flex-col gap-4 border-b border-border pb-3 sm:flex-row sm:items-end sm:justify-between">
+            <div className="mb-10 flex flex-col gap-5 border-b border-border pb-5 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <h1 className="text-2xl font-bold tracking-tight">
                   Análise de FIIs
@@ -78,7 +78,7 @@ export function AppShell() {
 
             <SourceCard loading={loading} onRefresh={() => run("/analysis/run")} onUpload={upload} />
 
-            <section className="mt-12">
+            <section className="mt-12 lg:mt-16">
               <Top10
                 funds={sortedTop10}
                 onSelect={setSelected}
@@ -88,7 +88,7 @@ export function AppShell() {
               />
             </section>
 
-            <section className="mt-14 w-full overflow-clip">
+            <section className="mt-14 w-full overflow-clip lg:mt-20">
               <SectionTitle
                 title="Ranking completo"
                 description="Clique em uma linha para abrir a análise detalhada."
@@ -99,7 +99,7 @@ export function AppShell() {
           </>
         ) : (
           <>
-            <div className="mb-8 border-b border-border pb-3">
+            <div className="mb-10 border-b border-border pb-5">
               <h1 className="text-2xl font-bold tracking-tight">
                 Diagnóstico do modelo
               </h1>

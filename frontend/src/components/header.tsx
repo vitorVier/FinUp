@@ -1,5 +1,6 @@
 "use client";
 
+import logoImg from '../../public/logo.png'
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -12,6 +13,7 @@ import {
 import { signOut, useSession } from "next-auth/react";
 
 import { Button } from "./ui/button";
+import Image from 'next/image';
 
 const NAV_ITEMS = [
     {
@@ -45,19 +47,14 @@ export function NavigationHeader() {
                     href="/"
                     className="flex items-center gap-2.5"
                 >
-                    <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
-                        <WalletCards className="h-4 w-4" />
-                    </div>
-
-                    <div className="hidden leading-none sm:block">
-                        <span className="block text-sm font-bold tracking-tight text-foreground">
-                            FinUp
-                        </span>
-
-                        <span className="mt-1 block text-[9px] font-medium uppercase tracking-wider text-muted-foreground">
-                            Gestor Financeiro e Analise de Fundos
-                        </span>
-                    </div>
+                    <Image
+                        src={logoImg}
+                        alt='Logo do app'
+                        width={115}
+                        height={115}
+                        priority
+                        quality={100}
+                    />
                 </Link>
 
                 {/* Navegação */}

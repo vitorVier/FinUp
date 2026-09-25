@@ -63,20 +63,14 @@ export function MyFundsTable({
                                 }}
                             >
                                 <td className="px-5 py-4 border-b border-border group-last/row:border-0">
-                                    <div className="flex items-center gap-3">
-                                        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-muted text-xs font-bold">
-                                            {fund.Papel.slice(0, 2)}
-                                        </div>
+                                    <div>
+                                        <p className="font-semibold">
+                                            {fund.Papel}
+                                        </p>
 
-                                        <div>
-                                            <p className="font-semibold">
-                                                {fund.Papel}
-                                            </p>
-
-                                            <p className="mt-0.5 text-xs text-muted-foreground">
-                                                Rank #{fund.Rank}
-                                            </p>
-                                        </div>
+                                        <p className="mt-0.5 text-xs text-muted-foreground">
+                                            Rank #{fund.Rank}
+                                        </p>
                                     </div>
                                 </td>
 

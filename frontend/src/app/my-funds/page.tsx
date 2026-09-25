@@ -147,7 +147,7 @@ export default function MeusFundosPage() {
 
     return (
         <>
-            <main className="mx-auto max-w-[1500px] px-5 py-8">
+            <main className="mx-auto max-w-[1500px] px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
                 <MyFundsHeader
                     search={search}
                     onSearchChange={setSearch}
@@ -166,7 +166,7 @@ export default function MeusFundosPage() {
 
                 <Card className="mt-6 overflow-hidden">
                     <CardHeader className="border-b pb-4">
-                        <div className="flex items-center justify-between gap-4 mb-1">
+                        <div className="mb-2 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                                 <CardTitle className="text-base">
                                     Seus fundos
@@ -218,7 +218,7 @@ export default function MeusFundosPage() {
                         )}
 
                         {currentList.length > 0 && (
-                            <div className="border-t px-5 py-3 text-xs text-muted-foreground">
+                            <div className="border-t px-5 py-4 text-xs text-muted-foreground sm:px-6">
                                 {funds.length} de{" "}
                                 {currentList.length} fundos exibidos
                             </div>
