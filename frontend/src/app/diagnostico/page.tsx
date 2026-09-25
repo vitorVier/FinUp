@@ -1,3 +1,5 @@
-import { redirect } from "next/navigation";
+import { AppShell } from "@/src/components/fii/app-shell";
 
-export default function Diagnostico() { redirect("/") }
+export default function DiagnosticoPage() {
+    return <AppShell />;
+}

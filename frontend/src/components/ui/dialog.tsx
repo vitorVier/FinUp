@@ -24,7 +24,7 @@ export function DialogContent({
                 {...p}
             >
                 {children}
-                <D.Close className="absolute right-4 top-4 rounded-md p-2 hover:bg-muted">
+                <D.Close className="absolute right-4 top-4 rounded-md p-2 hover:bg-muted hover:text-red-500">
                     <X className="h-4 w-4" />
                 </D.Close>
             </D.Content>

@@ -1,21 +1,22 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { ArrowUpDown, Search, SlidersHorizontal } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowUpDown, Eye, EyeIcon, EyeOff, Search, SlidersHorizontal, Star, StarIcon } from "lucide-react";
 import { Input } from "@/src/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select";
 import { RecommendationBadge } from "@/src/components/fii/recommendation-badge";
 import { formatPct } from "@/src/lib/utils";
 import type { Fund } from "@/src/types";
 
-const COLUMNS: [keyof Fund, string][] = [
-  ["Rank", "Rank"],
-  ["Papel", "Papel"],
-  ["Segmento", "Segmento"],
-  ["Dividend Yield", "DY"],
-  ["P/VP", "P/VP"],
-  ["Nota_Final", "Nota"],
-  ["Recomendacao", "Recomendação"],
+const COLUMNS: { key: keyof Fund | "actions"; label: string; className: string }[] = [
+  { key: "Rank", label: "Rank", className: "px-6" },
+  { key: "Papel", label: "Papel", className: "px-6" },
+  { key: "Segmento", label: "Segmento", className: "px-6" },
+  { key: "Dividend Yield", label: "DY", className: "px-6" },
+  { key: "P/VP", label: "P/VP", className: "px-5" },
+  { key: "Nota_Final", label: "Nota", className: "px-4" },
+  { key: "Recomendacao", label: "Recomendação", className: "px-4" },
+  { key: "actions", label: "", className: "px-6" },
 ];
 
 export function RankingTable({ funds, onSelect }: { funds: Fund[]; onSelect: (f: Fund) => void }) {
@@ -24,6 +25,21 @@ export function RankingTable({ funds, onSelect }: { funds: Fund[]; onSelect: (f:
   const [rec, setRec] = useState("all");
   const [sort, setSort] = useState<keyof Fund>("Rank");
   const [desc, setDesc] = useState(false);
+  const [listFilter, setListFilter] = useState<"all" | "WALLET" | "WATCHLIST">("all");
+  const [myFunds, setMyFunds] = useState<Map<string, "WALLET" | "WATCHLIST">>(new Map());
+  const pending = useRef<Set<string>>(new Set());
+
+  // Carrega estado real do servidor ao montar
+  useEffect(() => {
+    fetch("/api/user-fund")
+      .then((res) => res.json())
+      .then((data: { papel: string; list: "WALLET" | "WATCHLIST" }[]) => {
+        if (!Array.isArray(data)) return;
+        setMyFunds(new Map(data.map((f) => [f.papel, f.list])));
+      })
+      .catch(() => { });
+  }, []);
+
 
   const segments = [...new Set(funds.map((f) => f.Segmento).filter(Boolean))].sort();
 
@@ -34,14 +50,15 @@ export function RankingTable({ funds, onSelect }: { funds: Fund[]; onSelect: (f:
           (f) =>
             f.Papel.toLowerCase().includes(q.toLowerCase()) &&
             (seg === "all" || f.Segmento === seg) &&
-            (rec === "all" || f.Recomendacao === rec)
+            (rec === "all" || f.Recomendacao === rec) &&
+            (listFilter === "all" || myFunds.get(f.Papel) === listFilter)
         )
         .sort((a, b) => {
           const av = a[sort] as any;
           const bv = b[sort] as any;
           return (av > bv ? 1 : av < bv ? -1 : 0) * (desc ? -1 : 1);
         }),
-    [funds, q, seg, rec, sort, desc]
+    [funds, q, seg, rec, listFilter, myFunds, sort, desc]
   );
 
   const toggle = (k: keyof Fund) => {
@@ -49,6 +66,66 @@ export function RankingTable({ funds, onSelect }: { funds: Fund[]; onSelect: (f:
     else {
       setSort(k);
       setDesc(false);
+    }
+  };
+
+  const toggleFavorite = async (e: React.MouseEvent, papel: string) => {
+    e.stopPropagation();
+    if (pending.current.has(papel)) return;
+    pending.current.add(papel);
+
+    try {
+      const response = await fetch(`/api/user-fund/wallet`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ papel }),
+      });
+
+      if (!response.ok) return;
+
+      const { favorite } = await response.json();
+
+      setMyFunds((prev) => {
+        const next = new Map(prev);
+        if (favorite) {
+          next.set(papel, "WALLET");
+        } else {
+          next.delete(papel);
+        }
+        return next;
+      });
+    } finally {
+      pending.current.delete(papel);
+    }
+  };
+
+  const toggleWatchList = async (e: React.MouseEvent, papel: string) => {
+    e.stopPropagation();
+    if (pending.current.has(papel)) return;
+    pending.current.add(papel);
+
+    try {
+      const response = await fetch(`/api/user-fund/watchlist`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ papel }),
+      });
+
+      if (!response.ok) return;
+
+      const { favorite } = await response.json();
+
+      setMyFunds((prev) => {
+        const next = new Map(prev);
+        if (favorite) {
+          next.set(papel, "WATCHLIST");
+        } else {
+          next.delete(papel);
+        }
+        return next;
+      });
+    } finally {
+      pending.current.delete(papel);
     }
   };
 
@@ -62,7 +139,7 @@ export function RankingTable({ funds, onSelect }: { funds: Fund[]; onSelect: (f:
 
         <div className="flex w-full items-center gap-2 sm:w-auto sm:shrink-0">
           <Select value={seg} onValueChange={setSeg}>
-            <SelectTrigger className="min-w-0 flex-1 sm:w-[180px]">
+            <SelectTrigger className="min-w-0 flex-1 sm:w-[180px] pr-8">
               <div className="flex min-w-0 items-center gap-2">
                 <SlidersHorizontal className="h-4 w-4 shrink-0 text-slate-400" />
                 <span className="truncate">{seg === "all" ? "Todos segmentos" : seg}</span>
@@ -89,6 +166,17 @@ export function RankingTable({ funds, onSelect }: { funds: Fund[]; onSelect: (f:
               <SelectItem value="Risco Alto">Risco Alto</SelectItem>
             </SelectContent>
           </Select>
+
+          <Select value={listFilter} onValueChange={(val: any) => setListFilter(val)}>
+            <SelectTrigger className="min-w-0 flex-1 whitespace-nowrap sm:w-[130px]">
+              <SelectValue placeholder="Lista" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Minhas listas</SelectItem>
+              <SelectItem value="WALLET">Carteira</SelectItem>
+              <SelectItem value="WATCHLIST">Watchlist</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -96,30 +184,107 @@ export function RankingTable({ funds, onSelect }: { funds: Fund[]; onSelect: (f:
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-secondary/40 text-left text-xs text-slate-400">
-              {COLUMNS.map(([key, label]) => (
-                <th key={key} className="whitespace-nowrap px-4 py-3">
-                  <button className="inline-flex items-center gap-1 font-semibold" onClick={() => toggle(key)}>
-                    {label}
-                    <ArrowUpDown className="h-3 w-3" />
-                  </button>
+              {COLUMNS.map(({ key, label, className }) => (
+                <th key={key} className={`whitespace-nowrap py-3 ${className}`}>
+                  {key !== "actions" ? (
+                    <button className="inline-flex items-center gap-1 font-semibold" onClick={() => toggle(key as keyof Fund)}>
+                      {label}
+                      <ArrowUpDown className="h-3 w-3" />
+                    </button>
+                  ) : null}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {filtered.map((f) => (
-              <tr key={f.Papel} onClick={() => onSelect(f)} className="cursor-pointer border-b border-border last:border-0 hover:bg-secondary/40">
-                <td className="number px-4 py-3 font-semibold">#{f.Rank}</td>
-                <td className="px-4 py-3 font-bold">{f.Papel}</td>
-                <td className="px-4 py-3 text-slate-400">{f.Segmento}</td>
-                <td className="number px-4 py-3">{formatPct(f["Dividend Yield"])}</td>
-                <td className="number px-4 py-3">{f["P/VP"].toFixed(2)}</td>
-                <td className="number px-4 py-3 font-bold">{f.Nota_Final.toFixed(1)}</td>
-                <td className="px-4 py-3">
-                  <RecommendationBadge value={f.Recomendacao} />
-                </td>
-              </tr>
-            ))}
+            {filtered.map((f) => {
+              const isWallet = myFunds.has(f.Papel) && myFunds.get(f.Papel) === "WALLET";
+              const isWatchlist = myFunds.has(f.Papel) && myFunds.get(f.Papel) === "WATCHLIST";
+
+              return (
+                <tr
+                  key={f.Papel}
+                  onClick={() => onSelect(f)}
+                  className="cursor-pointer border-b border-border last:border-0 hover:bg-secondary/40"
+                >
+                  <td className="number px-6 py-3 font-semibold">
+                    #{f.Rank}
+                  </td>
+
+                  <td className="px-6 py-3 font-bold">
+                    {f.Papel}
+                  </td>
+
+                  <td className="px-6 py-3 text-slate-400">
+                    {f.Segmento}
+                  </td>
+
+                  <td className="number px-6 py-3">
+                    {formatPct(f["Dividend Yield"])}
+                  </td>
+
+                  <td className="number px-5 py-3">
+                    {f["P/VP"].toFixed(2)}
+                  </td>
+
+                  <td className="number px-4 py-3 font-bold">
+                    {f.Nota_Final.toFixed(1)}
+                  </td>
+
+                  <td className="px-4 py-3">
+                    <RecommendationBadge value={f.Recomendacao} />
+                  </td>
+
+                  <td className="flex items-center justify-end gap-3 px-6 py-3">
+                    <button
+                      type="button"
+                      onClick={(e) => toggleFavorite(e, f.Papel)}
+                      className="flex items-center justify-center"
+                      aria-label={
+                        isWallet
+                          ? "Remover da carteira"
+                          : "Adicionar à carteira"
+                      }
+                    >
+                      <StarIcon
+                        size={20}
+                        strokeWidth={1.5}
+                        className={
+                          isWallet
+                            ? "fill-yellow-400 text-yellow-400"
+                            : "text-muted-foreground"
+                        }
+                      />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={(e) => toggleWatchList(e, f.Papel)}
+                      className="group flex h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-blue-500/10"
+                      aria-label={
+                        isWatchlist
+                          ? "Remover da Watchlist"
+                          : "Adicionar à Watchlist"
+                      }
+                    >
+                      {isWatchlist ? (
+                        <Eye
+                          size={19}
+                          strokeWidth={2}
+                          className="text-blue-500 transition-colors"
+                        />
+                      ) : (
+                        <EyeOff
+                          size={19}
+                          strokeWidth={2}
+                          className="text-muted-foreground/60 transition-colors group-hover:text-blue-500"
+                        />
+                      )}
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

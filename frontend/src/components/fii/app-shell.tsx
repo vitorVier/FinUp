@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { usePathname } from "next/navigation";
 
 import { SourceCard } from "@/src/components/fii/source-card";
 import { Top10 } from "@/src/components/fii/top10";
@@ -18,11 +19,13 @@ import { FundDetail } from "@/src/components/fii/fund-detail";
 import { Diagnostics } from "@/src/components/fii/diagnostics";
 
 import type { Fund } from "@/src/types";
-import { NavigationHeader } from "../header";
 import { useAnalysis } from "@/src/hooks/useAnalysis";
 
 export function AppShell() {
-  const [page, setPage] = useState<"analise" | "diagnostico">("analise");
+  const pathname = usePathname();
+  const page: "analise" | "diagnostico" =
+    pathname === "/diagnostico" ? "diagnostico" : "analise";
+
   const { data, updatedAt, loading, error, run, upload } = useAnalysis();
   const [selected, setSelected] = useState<Fund | null>(null);
 
@@ -39,9 +42,7 @@ export function AppShell() {
 
   return (
     <div className="min-h-screen">
-      <NavigationHeader page={page} setPage={setPage} run={() => run("/analysis/run")} loading={loading} />
-
-      <main className="mx-auto max-w-[1500px] px-6 py-10">
+      <main className="mx-auto max-w-[1500px] px-6 py-8">
         {error && (
           <div className="mb-6 rounded border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
             {error}
@@ -54,12 +55,12 @@ export function AppShell() {
           <EmptyState loading={loading} onRefresh={() => run("/analysis/run")} onUpload={upload} />
         ) : page === "analise" ? (
           <>
-            <div className="mb-10 flex flex-col gap-4 border-b border-border pb-8 sm:flex-row sm:items-end sm:justify-between">
+            <div className="mb-8 flex flex-col gap-4 border-b border-border pb-3 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <h1 className="text-4xl font-extrabold tracking-tight text-foreground">
+                <h1 className="text-2xl font-bold tracking-tight">
                   Análise de FIIs
                 </h1>
-                <p className="mt-2 max-w-md text-sm text-slate-400">
+                <p className="mt-1 text-sm text-muted-foreground">
                   Modelo fuzzy Mamdani aplicado aos fundos aprovados na triagem.
                 </p>
               </div>
@@ -98,11 +99,11 @@ export function AppShell() {
           </>
         ) : (
           <>
-            <div className="mb-10 border-b border-border pb-8">
-              <h1 className="text-4xl font-extrabold tracking-tight text-foreground">
+            <div className="mb-8 border-b border-border pb-3">
+              <h1 className="text-2xl font-bold tracking-tight">
                 Diagnóstico do modelo
               </h1>
-              <p className="mt-2 max-w-md text-sm text-slate-400">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Área de auditoria: triagem, consistência e comportamento do sistema fuzzy.
               </p>
             </div>

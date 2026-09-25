@@ -29,7 +29,6 @@ import {
 } from "@/src/components/ui/card";
 
 import type { Analysis, Fund } from "@/src/types";
-import { useState } from "react";
 
 type ComparisonPoint = {
     papel?: string;
@@ -74,9 +73,7 @@ function normalizeRecommendation(value: string) {
         .replace(/[\u0300-\u036f]/g, "");
 }
 
-/* =========================================================
-   CORES DAS RECOMENDAÇÕES
-========================================================= */
+/* CORES DAS RECOMENDAÇÕES */
 
 const COLORS = {
     comprar: "#10b981",
@@ -90,12 +87,6 @@ function getRecommendationColor(
 ) {
     const normalized =
         normalizeRecommendation(recommendation);
-
-    /*
-     * IMPORTANTE:
-     * A ordem aqui evita que "comprar" seja
-     * confundido com outras categorias.
-     */
 
     if (
         normalized.includes("comprar") ||
@@ -122,9 +113,8 @@ function getRecommendationColor(
     return COLORS.default;
 }
 
-/* =========================================================
-   CLASSIFICAÇÃO
-========================================================= */
+/*
+   CLASSIFICAÇÃO */
 
 function getRecommendationType(item: ComparisonPoint) {
     const normalized = normalizeRecommendation(
@@ -165,10 +155,7 @@ function isTop10(item: ComparisonPoint) {
     );
 }
 
-/* =========================================================
-   PONTO PERSONALIZADO
-========================================================= */
-
+/* PONTO PERSONALIZADO */
 function CustomPoint(props: any) {
     const {
         cx,
@@ -188,14 +175,6 @@ function CustomPoint(props: any) {
     const item =
         payload as ComparisonPoint;
 
-    /*
-     * O fill agora vem diretamente da série
-     * do Scatter:
-     *
-     * Comprar  -> verde
-     * Analisar -> laranja
-     * Risco    -> vermelho
-     */
     const color =
         typeof fill === "string"
             ? fill
@@ -210,10 +189,7 @@ function CustomPoint(props: any) {
 
     return (
         <g>
-            {/* =========================================
-                ANEL DO TOP 10
-            ========================================= */}
-
+            {/* ANEL DO TOP 10 */}
             {highlighted && (
                 <circle
                     cx={cx}
@@ -226,10 +202,7 @@ function CustomPoint(props: any) {
                 />
             )}
 
-            {/* =========================================
-                PONTO
-            ========================================= */}
-
+            {/* PONTO */}
             <circle
                 cx={cx}
                 cy={cy}
@@ -244,9 +217,7 @@ function CustomPoint(props: any) {
                 }
             />
 
-            {/* =========================================
-                LABEL DO TOP 10
-            ========================================= */}
+            {/* LABEL DO TOP 10*/}
 
             {highlighted && (
                 <>
@@ -282,9 +253,7 @@ function CustomPoint(props: any) {
     );
 }
 
-/* =========================================================
-   TOOLTIP
-========================================================= */
+/* TOOLTIP */
 
 function CustomTooltip({
     active,
@@ -376,10 +345,7 @@ function CustomTooltip({
     );
 }
 
-/* =========================================================
-   LINHA DE TENDÊNCIA
-========================================================= */
-
+/* LINHA DE TENDÊNCIA */
 function calculateTrendLine(
     data: ComparisonPoint[]
 ) {
@@ -477,10 +443,7 @@ function calculateTrendLine(
     ];
 }
 
-/* =========================================================
-   MEDIANA
-========================================================= */
-
+/*MEDIANA */
 function getMedian(values: number[]) {
     if (!values.length) {
         return 0;
@@ -508,10 +471,7 @@ function getMedian(values: number[]) {
     return sorted[middle];
 }
 
-/* =========================================================
-   COMPONENTE PRINCIPAL
-========================================================= */
-
+/*COMPONENTE PRINCIPAL */
 function RecommendationDistribution({
     funds,
     top10,
@@ -1016,9 +976,7 @@ export function Diagnostics({
                 onSelect={onSelect}
             />
 
-            {/* =====================================================
-                COMPARAÇÃO FUZZY × RANKING
-            ===================================================== */}
+            {/* COMPARAÇÃO FUZZY × RANKING */}
 
             <Card className="lg:col-span-2">
                 <CardHeader className="pb-2">
@@ -1037,9 +995,7 @@ export function Diagnostics({
                             </p>
                         </div>
 
-                        {/* =========================================
-                            LEGENDA
-                        ========================================= */}
+                        {/* LEGENDA */}
 
                         <div className="flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground">
 
@@ -1082,9 +1038,7 @@ export function Diagnostics({
                                 }}
                             >
 
-                                {/* =====================================
-                                    GRID
-                                ===================================== */}
+                                {/* GRID */}
 
                                 <CartesianGrid
                                     strokeDasharray="3 3"
@@ -1093,10 +1047,7 @@ export function Diagnostics({
                                     horizontal
                                 />
 
-                                {/* =====================================
-                                    EIXO X
-                                ===================================== */}
-
+                                {/* EIXO X */}
                                 <XAxis
                                     type="number"
                                     dataKey="soma_ranks"
@@ -1131,10 +1082,7 @@ export function Diagnostics({
                                     }}
                                 />
 
-                                {/* =====================================
-                                    EIXO Y
-                                ===================================== */}
-
+                                {/* EIXO Y */}
                                 <YAxis
                                     type="number"
                                     dataKey="nota_final"
@@ -1174,10 +1122,7 @@ export function Diagnostics({
                                     ]}
                                 />
 
-                                {/* =====================================
-                                    MEDIANA X
-                                ===================================== */}
-
+                                {/* MEDIANA X */}
                                 {medianX > 0 && (
                                     <ReferenceLine
                                         x={medianX}
@@ -1186,10 +1131,7 @@ export function Diagnostics({
                                     />
                                 )}
 
-                                {/* =====================================
-                                    MEDIANA Y
-                                ===================================== */}
-
+                                {/* MEDIANA Y */}
                                 {medianY > 0 && (
                                     <ReferenceLine
                                         y={medianY}
@@ -1198,10 +1140,7 @@ export function Diagnostics({
                                     />
                                 )}
 
-                                {/* =====================================
-                                    TOOLTIP
-                                ===================================== */}
-
+                                {/* TOOLTIP*/}
                                 <Tooltip
                                     content={
                                         <CustomTooltip />
@@ -1214,10 +1153,7 @@ export function Diagnostics({
                                     }}
                                 />
 
-                                {/* =====================================
-                                    LINHA DE TENDÊNCIA
-                                ===================================== */}
-
+                                {/* LINHA DE TENDÊNCIA */}
                                 {trendLine.length ===
                                     2 && (
                                         <Line
@@ -1241,13 +1177,7 @@ export function Diagnostics({
                                         />
                                     )}
 
-                                {/* =================================================
-                                    🟢 COMPRAR
-                                    
-                                    Série independente.
-                                    O fill é FORÇADO para verde.
-                                ================================================= */}
-
+                                {/* COMPRAR */}
                                 <Scatter
                                     name="Comprar"
                                     data={
@@ -1261,13 +1191,7 @@ export function Diagnostics({
                                     }
                                 />
 
-                                {/* =================================================
-                                    🟠 ANALISAR
-                                    
-                                    Série independente.
-                                    O fill é FORÇADO para laranja.
-                                ================================================= */}
-
+                                {/* ANALISAR */}
                                 <Scatter
                                     name="Analisar"
                                     data={
@@ -1281,12 +1205,7 @@ export function Diagnostics({
                                     }
                                 />
 
-                                {/* =================================================
-                                    🔴 RISCO ALTO
-                                    
-                                    Série independente.
-                                    O fill é FORÇADO para vermelho.
-                                ================================================= */}
+                                {/* RISCO ALTO */}
 
                                 <Scatter
                                     name="Risco alto"
@@ -1301,10 +1220,7 @@ export function Diagnostics({
                                     }
                                 />
 
-                                {/* =================================================
-                                    ⚪ OUTROS
-                                ================================================= */}
-
+                                {/* NÃO CLASSIFICADO */}
                                 {defaultData.length >
                                     0 && (
                                         <Scatter
@@ -1324,10 +1240,7 @@ export function Diagnostics({
                             </ScatterChart>
                         </ResponsiveContainer>
 
-                        {/* =========================================
-                            INDICADORES DE QUADRANTE
-                        ========================================= */}
-
+                        {/* INDICADORES DE QUADRANTE */}
                         <div className="pointer-events-none absolute left-20 top-3 rounded-md bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold text-emerald-700">
                             Melhor combinação
                         </div>
@@ -1337,10 +1250,7 @@ export function Diagnostics({
                         </div>
                     </div>
 
-                    {/* =============================================
-                        LEITURA DO GRÁFICO
-                    ============================================= */}
-
+                    {/* INDICADORES DE QUADRANTE */}
                     <div className="mt-3 grid gap-3 border-t pt-4 sm:grid-cols-3">
 
                         <div className="rounded-lg bg-emerald-50/70 p-3">
@@ -1385,10 +1295,7 @@ export function Diagnostics({
                 </CardContent>
             </Card>
 
-            {/* =====================================================
-                ROBUSTEZ
-            ===================================================== */}
-
+            {/* ROBUSTEZ  */}
             <Card className="lg:col-span-2">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -1413,10 +1320,7 @@ export function Diagnostics({
                 </CardContent>
             </Card>
 
-            {/* =====================================================
-                REGRAS FUZZY
-            ===================================================== */}
-
+            {/* REGRAS FUZZY */}
             <Card className="lg:col-span-2">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">

@@ -2,7 +2,7 @@ import { NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
  
 export default {
-    session: { strategy: "jwt" },
+    session: { strategy: "database" },
     providers: [Google],
     secret: process.env.BETTER_AUTH_SECRET || process.env.NEXTAUTH_SECRET,
     pages: {
@@ -12,14 +12,12 @@ export default {
         authorized({ auth }) {
             return !!auth;
         },
-        async jwt({ token, user }) {
-            if (user) token.sub = user.id;
-            return token;
-        },
-        async session({ session, token }) {
-            if (session.user && token.sub) {
-                session.user.id = token.sub;
+
+        async session({ session, user }) {
+            if (session.user) {
+                session.user.id = user.id;
             }
+
             return session;
         },
     },
