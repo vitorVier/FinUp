@@ -9,6 +9,14 @@ import {
     CardTitle,
 } from "@/src/components/ui/card";
 
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from "@/src/components/ui/dialog";
+
 import { FundDetail } from "@/src/components/fii/fund-detail";
 
 import { MyFundsHeader } from "./components/my-funds-header";
@@ -21,6 +29,7 @@ import { MyFundsTable } from "./components/my-funds-table";
 import { MyFundsEmpty } from "./components/my-funds-empty";
 
 import { useAnalysis } from "@/src/hooks/useAnalysis";
+import { useOportunities } from "@/src/hooks/useOportunities";
 
 import type { Fund } from "@/src/types";
 
@@ -35,6 +44,7 @@ type UserFund = {
 
 export default function MeusFundosPage() {
     const { data: analysis, loading: analysisLoading } = useAnalysis();
+    const { mudancas, sync, ack } = useOportunities();
 
     const [wallet, setWallet] = useState<UserFund[]>([]);
     const [watchlist, setWatchlist] = useState<UserFund[]>([]);
@@ -52,26 +62,16 @@ export default function MeusFundosPage() {
             setLoading(true);
             setError(null);
 
-            const [walletResponse, watchlistResponse] =
-                await Promise.all([
-                    fetch("/api/user-fund/wallet"),
-                    fetch("/api/user-fund/watchlist"),
-                ]);
+            const response = await fetch("/api/user-fund");
 
-            if (!walletResponse.ok || !watchlistResponse.ok) {
-                throw new Error(
-                    "Não foi possível carregar seus fundos."
-                );
+            if (!response.ok) {
+                throw new Error("Não foi possível carregar seus fundos.");
             }
 
-            const [walletData, watchlistData] =
-                await Promise.all([
-                    walletResponse.json(),
-                    watchlistResponse.json(),
-                ]);
+            const allFunds: UserFund[] = await response.json();
 
-            setWallet(walletData);
-            setWatchlist(watchlistData);
+            setWallet(allFunds.filter((f) => f.list === "WALLET"));
+            setWatchlist(allFunds.filter((f) => f.list === "WATCHLIST"));
         } catch (error) {
             setError(
                 error instanceof Error
@@ -86,6 +86,28 @@ export default function MeusFundosPage() {
     useEffect(() => {
         loadFunds();
     }, []);
+
+    // Detecta mudança de recomendação pra TODOS os fundos salvos
+    useEffect(() => {
+        if (!analysis?.ranking_completo) return;
+
+        const papeisSalvos = new Set([
+            ...wallet.map((f) => f.papel),
+            ...watchlist.map((f) => f.papel),
+        ]);
+
+        if (papeisSalvos.size === 0) return;
+
+        const fundsToSync = analysis.ranking_completo
+            .filter((f) => papeisSalvos.has(f.Papel))
+            .map((f) => ({
+                papel: f.Papel,
+                recomendacao: f.Recomendacao,
+                notaFinal: Number(f.Nota_Final ?? 0),
+            }));
+
+        if (fundsToSync.length > 0) sync(fundsToSync);
+    }, [analysis, wallet, watchlist, sync]);
 
     const currentList =
         activeTab === "wallet" ? wallet : watchlist;
@@ -137,11 +159,20 @@ export default function MeusFundosPage() {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ papel, list }),
+            body: JSON.stringify({ papel }),
         });
 
         if (response.ok) {
             await loadFunds();
+        }
+    };
+
+    const handleSelect = (fund: Fund) => {
+        setSelected(fund);
+
+        const estaSalvo = walletTickers.has(fund.Papel) || watchlistTickers.has(fund.Papel);
+        if (estaSalvo) {
+            ack(fund.Papel, fund.Recomendacao, Number(fund.Nota_Final ?? 0));
         }
     };
 
@@ -212,7 +243,8 @@ export default function MeusFundosPage() {
                                         ? "WALLET"
                                         : "WATCHLIST"
                                 }
-                                onSelect={setSelected}
+                                mudancas={mudancas}
+                                onSelect={handleSelect}
                                 onToggle={toggleList}
                             />
                         )}
@@ -225,16 +257,25 @@ export default function MeusFundosPage() {
                         )}
                     </div>
                 </Card>
-
-                {selected && analysis && (
-                    <FundDetail
-                        fund={selected}
-                        analysis={analysis}
-                        onClose={() => setSelected(null)}
-                        onSelect={setSelected}
-                    />
-                )}
             </main>
+
+            <Dialog open={!!selected} onOpenChange={(open) => !open && setSelected(null)}>
+                <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto rounded p-0">
+                    <DialogHeader className="sr-only">
+                        <DialogTitle>Detalhes do fundo</DialogTitle>
+                        <DialogDescription>Análise fuzzy detalhada do fundo selecionado.</DialogDescription>
+                    </DialogHeader>
+
+                    {selected && analysis && (
+                        <FundDetail
+                            fund={selected}
+                            analysis={analysis}
+                            onClose={() => setSelected(null)}
+                            onSelect={handleSelect}
+                        />
+                    )}
+                </DialogContent>
+            </Dialog>
         </>
     );
 }

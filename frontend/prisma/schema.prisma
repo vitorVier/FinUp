@@ -1,6 +1,6 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
   moduleFormat = "cjs"
 }
 
@@ -8,18 +8,17 @@ datasource db {
   provider = "postgresql"
 }
 
-
 model User {
   id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
   emailVerified DateTime?
   image         String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-  accounts Account[]
-  sessions Session[]
+  accounts  Account[]
+  sessions  Session[]
   userFunds UserFund[]
 }
 
@@ -60,12 +59,15 @@ model VerificationToken {
 }
 
 model UserFund {
-  id        String     @id @default(cuid())
-  userId    String
-  papel     String
-  list     FundList
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id                 String    @id @default(cuid())
+  userId             String
+  papel              String
+  list               FundList
+  ultimaRecomendacao String?
+  ultimaNotaFinal    Float?
+  verificadoEm       DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 
 import { SourceCard } from "@/src/components/fii/source-card";
@@ -20,6 +20,7 @@ import { Diagnostics } from "@/src/components/fii/diagnostics";
 
 import type { Fund } from "@/src/types";
 import { useAnalysis } from "@/src/hooks/useAnalysis";
+import { useOportunities } from "@/src/hooks/useOportunities";
 
 export function AppShell() {
   const pathname = usePathname();
@@ -27,9 +28,50 @@ export function AppShell() {
     pathname === "/diagnostico" ? "diagnostico" : "analise";
 
   const { data, updatedAt, loading, error, run, upload } = useAnalysis();
+  const { sync, ack } = useOportunities();
+  const [savedFunds, setSavedFunds] = useState<
+    { papel: string; list: "WALLET" | "WATCHLIST" }[]
+  >([]);
   const [selected, setSelected] = useState<Fund | null>(null);
-
   const [sortMode, setSortMode] = useState<"fuzzy" | "tradicional">("tradicional");
+
+  useEffect(() => {
+    async function loadSavedFunds() {
+      try {
+        const response = await fetch("/api/user-fund");
+
+        if (!response.ok) return;
+
+        const funds = await response.json();
+
+        setSavedFunds(funds);
+      } catch {
+        // silencioso
+      }
+    }
+
+    loadSavedFunds();
+  }, []);
+
+  useEffect(() => {
+    if (!data?.ranking_completo || savedFunds.length === 0) return;
+
+    const savedTickers = new Set(
+      savedFunds.map((fund) => fund.papel)
+    );
+
+    const fundsToSync = data.ranking_completo
+      .filter((fund) => savedTickers.has(fund.Papel))
+      .map((fund) => ({
+        papel: fund.Papel,
+        recomendacao: fund.Recomendacao,
+        notaFinal: Number(fund.Nota_Final ?? 0),
+      }));
+
+    if (fundsToSync.length > 0) {
+      sync(fundsToSync);
+    }
+  }, [data, savedFunds, sync]);
 
   const sortedTop10 = useMemo(() => {
     if (!data?.top10) return [];
@@ -39,6 +81,22 @@ export function AppShell() {
       return a.Soma_Ranks_Simples - b.Soma_Ranks_Simples;
     });
   }, [data?.top10, sortMode]);
+
+  const handleSelect = (fund: Fund) => {
+    setSelected(fund);
+
+    const isSaved = savedFunds.some(
+      (saved) => saved.papel === fund.Papel
+    );
+
+    if (isSaved) {
+      ack(
+        fund.Papel,
+        fund.Recomendacao,
+        Number(fund.Nota_Final ?? 0)
+      );
+    }
+  };
 
   return (
     <div className="min-h-screen">
@@ -81,7 +139,7 @@ export function AppShell() {
             <section className="mt-12 lg:mt-16">
               <Top10
                 funds={sortedTop10}
-                onSelect={setSelected}
+                onSelect={handleSelect}
                 data={data}
                 sortMode={sortMode}
                 onSortModeChange={setSortMode}
@@ -94,7 +152,7 @@ export function AppShell() {
                 description="Clique em uma linha para abrir a análise detalhada."
               />
 
-              <RankingTable funds={data.ranking_completo} onSelect={setSelected} />
+              <RankingTable funds={data.ranking_completo} onSelect={handleSelect} />
             </section>
           </>
         ) : (
@@ -108,7 +166,7 @@ export function AppShell() {
               </p>
             </div>
 
-            <Diagnostics analysis={data} onSelect={setSelected} />
+            <Diagnostics analysis={data} onSelect={handleSelect} />
           </>
         )}
       </main>

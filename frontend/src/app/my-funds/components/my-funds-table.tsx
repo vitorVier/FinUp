@@ -1,17 +1,20 @@
 "use client";
 
-import { Eye, EyeOff, Star } from "lucide-react";
+import { Eye, EyeOff, Sparkles, Star, TrendingUp } from "lucide-react";
 
 import { RecommendationBadge } from "@/src/components/fii/recommendation-badge";
 import { formatPct } from "@/src/lib/utils";
 
 import type { Fund } from "@/src/types";
 
+type StatusMudanca = "oportunidade" | "mudou";
+
 interface MyFundsTableProps {
     funds: Fund[];
     walletTickers: Set<string>;
     watchlistTickers: Set<string>;
     activeList: "WALLET" | "WATCHLIST";
+    mudancas: Record<string, StatusMudanca>;
     onSelect: (fund: Fund) => void;
     onToggle: (
         e: React.MouseEvent,
@@ -20,11 +23,31 @@ interface MyFundsTableProps {
     ) => void;
 }
 
+// Chip pequeno, ao lado do ticker — mesma ideia visual do
+// RecommendationBadge, cores diferentes pra não confundir com recomendação.
+function MudancaBadge({ status }: { status: StatusMudanca }) {
+    if (status === "oportunidade") {
+        return (
+            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
+                <TrendingUp size={12} />
+                Oportunidade
+            </span>
+        );
+    }
+    return (
+        <span className="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700">
+            <Sparkles size={12} />
+            Mudou
+        </span>
+    );
+}
+
 export function MyFundsTable({
     funds,
     walletTickers,
     watchlistTickers,
     activeList,
+    mudancas,
     onSelect,
     onToggle,
 }: MyFundsTableProps) {
@@ -51,6 +74,7 @@ export function MyFundsTable({
                     {funds.map((fund) => {
                         const inWallet = walletTickers.has(fund.Papel);
                         const inWatchlist = watchlistTickers.has(fund.Papel);
+                        const mudanca = mudancas[fund.Papel];
 
                         return (
                             <tr
@@ -64,9 +88,12 @@ export function MyFundsTable({
                             >
                                 <td className="px-5 py-4 border-b border-border group-last/row:border-0">
                                     <div>
-                                        <p className="font-semibold">
-                                            {fund.Papel}
-                                        </p>
+                                        <div className="flex items-center gap-2">
+                                            <p className="font-semibold">
+                                                {fund.Papel}
+                                            </p>
+                                            {mudanca && <MudancaBadge status={mudanca} />}
+                                        </div>
 
                                         <p className="mt-0.5 text-xs text-muted-foreground">
                                             Rank #{fund.Rank}
