@@ -47,22 +47,22 @@ const NAV_GROUPS = [
         label: "Financeiro",
         items: [
             {
-                href: "/financeiro",
+                href: "/finance",
                 label: "Visão geral",
                 icon: Landmark,
             },
             {
-                href: "/financeiro/lancamentos",
+                href: "/finance/transactions",
                 label: "Lançamentos",
                 icon: Receipt,
             },
             {
-                href: "/financeiro/orcamentos",
+                href: "/finance/budgets",
                 label: "Orçamentos",
                 icon: PiggyBank,
             },
             {
-                href: "/financeiro/metas",
+                href: "/finance/goals",
                 label: "Metas",
                 icon: Target,
             },
@@ -81,8 +81,7 @@ export function Sidebar() {
         setMobileOpen(false);
     }, [pathname]);
 
-    const isActive = (href: string) =>
-        href === "/" ? pathname === "/" : pathname.startsWith(href);
+    const isActive = (href: string) => pathname === href;
 
     const SidebarContent = () => (
         <div className="flex h-full flex-col bg-[#052b2b] text-white">

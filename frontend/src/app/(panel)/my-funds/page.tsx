@@ -196,7 +196,7 @@ export default function MeusFundosPage() {
                 />
 
                 <Card className="mt-6 overflow-hidden">
-                    <CardHeader className="border-b pb-4">
+                    <CardHeader className="flex-col border-b pb-4">
                         <div className="mb-2 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                                 <CardTitle className="text-base">

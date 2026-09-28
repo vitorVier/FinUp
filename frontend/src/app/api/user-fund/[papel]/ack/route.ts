@@ -23,9 +23,6 @@ export async function POST(
         const body = await request.json();
         const { recomendacao, notaFinal } = schema.parse(body);
 
-        // updateMany (não update): se o fundo não estiver mais salvo (foi
-        // removido entre o front carregar e você abrir o modal), isso não
-        // deve estourar erro — só não faz nada.
         await prisma.userFund.updateMany({
             where: { userId: session.user.id, papel: decodeURIComponent(papel).toUpperCase() },
             data: {

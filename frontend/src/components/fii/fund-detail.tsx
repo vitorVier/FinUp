@@ -274,7 +274,7 @@ export function FundDetail({
 
                 {/* PREÇO-ALVO */}
                 <Card className="mt-3">
-                    <CardHeader className="pb-2">
+                    <CardHeader className="flex-col pb-2">
                         <CardTitle className="flex items-center gap-2 text-base">
                             <Target className="h-4 w-4 text-primary" />
                             Valuation
@@ -376,12 +376,9 @@ export function FundDetail({
                     </CardContent>
                 </Card>
 
-                {/* ====================================================
-                    TESE DO MODELO
-                ==================================================== */}
-
+                {/* TESE DO MODELO */}
                 <Card className="mt-3">
-                    <CardHeader className="pb-2">
+                    <CardHeader className="flex-col pb-2">
                         <CardTitle className="flex items-center gap-2 text-base">
                             <TrendingUp className="h-4 w-4 text-primary" />
                             O que o modelo está dizendo
@@ -431,13 +428,10 @@ export function FundDetail({
                     </CardContent>
                 </Card>
 
-                {/* ====================================================
-                    CONFIANÇA DA DECISÃO
-                ==================================================== */}
-
+                {/* CONFIANÇA DA DECISÃO */}
                 {dadosFuzzyDisponiveis && (
                     <Card className="mt-3">
-                        <CardHeader className="pb-2">
+                        <CardHeader className="flex-col pb-2">
                             <CardTitle className="flex items-center gap-2 text-base">
                                 <CheckCircle2 className="h-4 w-4 text-primary" />
                                 Confiança da decisão
@@ -472,12 +466,9 @@ export function FundDetail({
                     </Card>
                 )}
 
-                {/* ====================================================
-                    RISCOS
-                ==================================================== */}
-
+                {/* RISCOS */}
                 <Card className="mt-3">
-                    <CardHeader className="pb-2">
+                    <CardHeader className="flex-col pb-2">
                         <CardTitle className="flex items-center gap-2 text-base">
                             <ShieldAlert className="h-4 w-4 text-primary" />
                             Pontos de atenção
@@ -527,13 +518,10 @@ export function FundDetail({
                     </CardContent>
                 </Card>
 
-                {/* ====================================================
-                    SUSTENTABILIDADE DO DIVIDENDO
-                ==================================================== */}
-
+                {/* SUSTENTABILIDADE DO DIVIDENDO */}
                 {ffoYield != null && (
                     <Card className="mt-3">
-                        <CardHeader className="pb-2">
+                        <CardHeader className="flex-col pb-2">
                             <CardTitle className="flex items-center gap-2 text-base">
                                 <Wallet className="h-4 w-4 text-primary" />
                                 Sustentabilidade do dividendo
@@ -565,13 +553,10 @@ export function FundDetail({
                     </Card>
                 )}
 
-                {/* ====================================================
-                    FUZZY × TRADICIONAL
-                ==================================================== */}
-
+                {/* FUZZY × TRADICIONAL */}
                 {comparacao && (
                     <Card className="mt-3">
-                        <CardHeader className="pb-2">
+                        <CardHeader className="flex-col pb-2">
                             <CardTitle className="flex items-center gap-2 text-base">
                                 <Info className="h-4 w-4 text-primary" />
                                 Fuzzy × método tradicional
@@ -599,12 +584,9 @@ export function FundDetail({
                     </Card>
                 )}
 
-                {/* ====================================================
-                    RESUMO PARA DECISÃO
-                ==================================================== */}
-
+                {/* RESUMO PARA DECISÃO */}
                 <Card className="mt-3 border-primary/20 bg-primary/[0.02]">
-                    <CardHeader className="pb-2">
+                    <CardHeader className="flex-col pb-2">
                         <CardTitle className="text-base">Resumo para decisão</CardTitle>
                     </CardHeader>
 

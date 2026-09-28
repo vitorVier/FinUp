@@ -17,9 +17,12 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts  Account[]
-  sessions  Session[]
-  userFunds UserFund[]
+  accounts     Account[]
+  sessions     Session[]
+  userFunds    UserFund[]
+  categories   TransactionCategory[]
+  transactions Transaction[]
+  recurrences  Recurrence[]
 }
 
 model Account {
@@ -74,7 +77,71 @@ model UserFund {
   @@unique([userId, papel])
 }
 
+model TransactionCategory {
+  id        String          @id @default(cuid())
+  userId    String
+  name      String
+  color     String
+  type      TransactionType
+  icon      String
+  isActive  Boolean         @default(true)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  recurrences  Recurrence[]
+
+  @@unique([userId, name, type])
+}
+
+model Transaction {
+  id           String  @id @default(cuid())
+  userId       String
+  categoryId   String
+  recurrencyId String?
+
+  value       Decimal           @db.Decimal(10, 2)
+  description String?
+  date        DateTime          @db.Date
+  status      TransactionStatus @default(PENDING)
+  type        TransactionType
+
+  user     User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category TransactionCategory @relation(fields: [categoryId], references: [id])
+
+  @@unique([userId, id])
+}
+
+model Recurrence {
+  id         String            @id @default(cuid())
+  userId     String
+  name       String
+  value      Decimal           @db.Decimal(10, 2)
+  day        Int?
+  status     TransactionStatus @default(PENDING)
+  isActive   Boolean           @default(true)
+  type       TransactionType
+  categoryId String
+
+  user     User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category TransactionCategory @relation(fields: [categoryId], references: [id])
+
+  @@unique([userId, id])
+}
+
 enum FundList {
   WALLET
   WATCHLIST
+}
+
+enum TransactionType {
+  INFLOW
+  OUTFLOW
+}
+
+enum TransactionStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
 }

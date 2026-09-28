@@ -9,7 +9,7 @@ export const Card = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
 Card.displayName = "Card";
 
 export const CardHeader = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn("flex flex-col gap-1.5 p-6", className)} {...props} />
+  <div className={cn("flex gap-1.5 p-6", className)} {...props} />
 );
 
 export const CardTitle = ({ className, ...props }: HTMLAttributes<HTMLHeadingElement>) => (

@@ -15,7 +15,7 @@ export function SourceCard({
 }) {
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex-col">
         <CardTitle>Origem dos dados</CardTitle>
         <CardDescription>Atualize pelo Fundamentus ou use uma planilha compatível.</CardDescription>
       </CardHeader>

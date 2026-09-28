@@ -43,22 +43,14 @@ export async function POST(request: Request) {
         for (const fundo of funds) {
             const salvo = salvosPorPapel.get(fundo.papel);
 
-            // Sem valor anterior salvo (fundo acabado de adicionar) -> nada
-            // pra comparar ainda. Isso também é o que evita todo fundo
-            // aparecer como "mudou" na primeira vez que ele é adicionado.
             if (!salvo || salvo.ultimaRecomendacao == null) continue;
 
-            if (salvo.ultimaRecomendacao === fundo.recomendacao) continue; // sem mudança
+            if (salvo.ultimaRecomendacao === fundo.recomendacao) continue;
 
             mudancas[fundo.papel] =
                 fundo.recomendacao === "Comprar" ? "oportunidade" : "mudou";
         }
 
-        // `verificadoEm` é só bookkeeping (última vez que checamos) — não
-        // interfere na comparação, que sempre usa `ultimaRecomendacao`.
-        // Atualizar isso aqui é seguro mesmo pros que mudaram, porque não
-        // tocamos em `ultimaRecomendacao`/`ultimaNotaFinal` (só o /ack faz
-        // isso).
         await prisma.userFund.updateMany({
             where: { userId: session.user.id, papel: { in: funds.map((f) => f.papel) } },
             data: { verificadoEm: new Date() },

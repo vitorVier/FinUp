@@ -549,7 +549,7 @@ function RecommendationDistribution({
 
     return (
         <Card>
-            <CardHeader className="pb-3">
+            <CardHeader className="flex-col pb-3">
                 <CardTitle className="flex items-center gap-2">
                     <PieChart className="h-4 w-4 text-primary" />
                     Distribuição das recomendações
@@ -828,7 +828,7 @@ export function Diagnostics({
     return (
         <div className="grid gap-5 lg:grid-cols-2">
             <Card>
-                <CardHeader className="pb-3">
+                <CardHeader className="flex-col pb-3">
                     <CardTitle className="flex items-center gap-2">
                         <BarChart3 className="h-4 w-4 text-primary" />
                         Funil de triagem
@@ -977,9 +977,8 @@ export function Diagnostics({
             />
 
             {/* COMPARAÇÃO FUZZY × RANKING */}
-
             <Card className="lg:col-span-2">
-                <CardHeader className="pb-2">
+                <CardHeader className="flex-col pb-2">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 
                         <div>
@@ -1297,7 +1296,7 @@ export function Diagnostics({
 
             {/* ROBUSTEZ  */}
             <Card className="lg:col-span-2">
-                <CardHeader>
+                <CardHeader className="flex-col">
                     <CardTitle className="flex items-center gap-2">
                         <AlertTriangle className="h-4 w-4 text-amber-500" />
                         Robustez da defuzzificação
@@ -1322,7 +1321,7 @@ export function Diagnostics({
 
             {/* REGRAS FUZZY */}
             <Card className="lg:col-span-2">
-                <CardHeader>
+                <CardHeader className="flex-col">
                     <CardTitle className="flex items-center gap-2">
                         <TrendingUp className="h-4 w-4 text-primary" />
                         Regras fuzzy
