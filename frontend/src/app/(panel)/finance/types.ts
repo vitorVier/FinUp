@@ -11,6 +11,7 @@ export interface TransactionCategory {
     color: string;
     icon: string;
     type: TransactionType;
+    isActive?: boolean;
 }
 
 export interface Transaction {
@@ -22,4 +23,5 @@ export interface Transaction {
     status: TransactionStatus;
     type: TransactionType;
     category: TransactionCategory;
+    recurringId?: string | null;
 }

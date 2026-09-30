@@ -7,6 +7,7 @@ import {
     Trash2,
     ArrowDownLeft,
     ArrowUpRight,
+    Repeat,
 } from "lucide-react";
 
 import {
@@ -29,7 +30,7 @@ import { FinanceTransactionStatus } from "./finance-transaction-status";
 import type {
     Transaction,
     TransactionStatus,
-} from "../page";
+} from "../../types";
 
 interface Props {
     transactions: Transaction[];
@@ -159,11 +160,26 @@ export function FinanceTransactionTable({
                                                     "Sem descrição"}
                                             </p>
 
-                                            <p className="mt-0.5 text-xs text-muted-foreground">
-                                                {isInflow
-                                                    ? "Entrada financeira"
-                                                    : "Saída financeira"}
-                                            </p>
+                                            <div className="mt-0.5 flex items-center gap-1.5">
+                                                <p className="text-xs text-muted-foreground">
+                                                    {isInflow
+                                                        ? "Entrada financeira"
+                                                        : "Saída financeira"}
+                                                </p>
+
+                                                {Boolean(
+                                                    (
+                                                        transaction as Transaction & {
+                                                            recurrencyId?: string | null;
+                                                        }
+                                                    ).recurrencyId
+                                                ) && (
+                                                        <span className="inline-flex items-center gap-1 rounded-full bg-[#053032]/8 px-1.5 py-0.5 text-[9px] font-medium text-[#053032]">
+                                                            <Repeat className="h-2.5 w-2.5" />
+                                                            Recorrente
+                                                        </span>
+                                                    )}
+                                            </div>
                                         </td>
 
                                         <td className="px-4 py-4">

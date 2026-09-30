@@ -8,6 +8,7 @@ import {
     CircleDollarSign,
     FileText,
     Plus,
+    Repeat,
     Tag,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -34,10 +35,10 @@ import {
 import type {
     Transaction,
     TransactionCategory,
-    TransactionFormData,
     TransactionStatus,
     TransactionType,
-} from "../page";
+} from "../../types";
+import { TransactionFormData } from "../page";
 import { toNumber } from "../../utils";
 
 interface Props {
@@ -61,8 +62,7 @@ export function FinanceTransactionDialog({
     onSave,
     onCategoryCreated,
 }: Props) {
-    const [type, setType] =
-        useState<TransactionType>("OUTFLOW");
+    const [type, setType] = useState<TransactionType>("OUTFLOW");
 
     const [categoryId, setCategoryId] = useState("");
     const [value, setValue] = useState("");
@@ -70,6 +70,7 @@ export function FinanceTransactionDialog({
     const [date, setDate] = useState(today());
 
     const [status, setStatus] = useState<TransactionStatus>("PENDING");
+    const [isRecurring, setIsRecurring] = useState(false);
     const [saving, setSaving] = useState(false);
 
     // Nova categoria
@@ -96,6 +97,7 @@ export function FinanceTransactionDialog({
             setDescription(transaction.description ?? "");
             setDate(transaction.date.slice(0, 10));
             setStatus(transaction.status);
+            setIsRecurring(false);
         } else {
             setType("OUTFLOW");
             setCategoryId("");
@@ -103,6 +105,7 @@ export function FinanceTransactionDialog({
             setDescription("");
             setDate(today());
             setStatus("PENDING");
+            setIsRecurring(false);
         }
     }, [transaction, open]);
 
@@ -133,6 +136,7 @@ export function FinanceTransactionDialog({
                 description,
                 date,
                 status,
+                recurring: isRecurring,
             });
         } finally {
             setSaving(false);
@@ -452,6 +456,69 @@ export function FinanceTransactionDialog({
                                     </Select>
                                 </div>
                             </div>
+
+                            {/* RECORRÊNCIA */}
+                            {!transaction ? (
+                                <div className="rounded-xl border border-border/70 bg-muted/20 p-3.5">
+                                    <label className="flex cursor-pointer items-start gap-3">
+                                        <input
+                                            type="checkbox"
+                                            checked={isRecurring}
+                                            onChange={(event) =>
+                                                setIsRecurring(event.target.checked)
+                                            }
+                                            disabled={saving}
+                                            className="mt-0.5 h-4 w-4 shrink-0 accent-[#053032]"
+                                        />
+
+                                        <span className="min-w-0">
+                                            <span className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                                                <Repeat className="h-3.5 w-3.5 text-[#053032]" />
+                                                Tornar lançamento recorrente
+                                            </span>
+
+                                            <span className="mt-0.5 block text-[11px] leading-relaxed text-muted-foreground">
+                                                Repetir automaticamente todos os meses no dia{" "}
+                                                {date
+                                                    ? Number(date.slice(8, 10))
+                                                    : "definido pela data"}.
+                                            </span>
+                                        </span>
+                                    </label>
+
+                                    {isRecurring && (
+                                        <div className="mt-3 flex items-center gap-2 rounded-lg bg-background px-3 py-2.5 text-[11px] text-muted-foreground">
+                                            <Repeat className="h-3.5 w-3.5 shrink-0 text-[#053032]" />
+
+                                            <span>
+                                                Os próximos lançamentos serão gerados
+                                                automaticamente como{" "}
+                                                <strong className="font-semibold text-foreground">
+                                                    Previstos
+                                                </strong>
+                                                .
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                Boolean(
+                                    (
+                                        transaction as Transaction & {
+                                            recurrencyId?: string | null;
+                                        }
+                                    ).recurrencyId
+                                ) && (
+                                    <div className="flex items-start gap-2.5 rounded-xl border border-border/70 bg-muted/20 px-3.5 py-3 text-[11px] leading-relaxed text-muted-foreground">
+                                        <Repeat className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#053032]" />
+
+                                        <span>
+                                            Este lançamento pertence a uma recorrência.
+                                            Alterações aqui afetam apenas este lançamento.
+                                        </span>
+                                    </div>
+                                )
+                            )}
 
                             {/* AÇÕES */}
                             <div className="flex flex-col-reverse gap-2 border-t pt-5 sm:flex-row sm:justify-end">

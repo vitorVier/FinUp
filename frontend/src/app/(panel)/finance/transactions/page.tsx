@@ -9,31 +9,10 @@ import { FinanceTransactionFilters } from "./components/finance-transaction-filt
 import { FinanceTransactionTable } from "./components/finance-transaction-table";
 import { FinanceTransactionDialog } from "./components/finance-transaction-dialog";
 import { FinanceTransactionsEmpty } from "./components/finance-transaction-empty";
+import { Transaction, TransactionCategory } from "../types";
 
 export type TransactionType = "INFLOW" | "OUTFLOW";
 export type TransactionStatus = "PENDING" | "CONFIRMED" | "CANCELLED";
-
-export interface TransactionCategory {
-    id: string;
-    name: string;
-    color: string;
-    type: TransactionType;
-    icon: string;
-    isActive: boolean;
-}
-
-export interface Transaction {
-    id: string;
-    userId: string;
-    categoryId: string;
-    recurrencyId?: string | null;
-    value: string | number;
-    description?: string | null;
-    date: string;
-    status: TransactionStatus;
-    type: TransactionType;
-    category: TransactionCategory;
-}
 
 export interface TransactionFormData {
     type: TransactionType;
@@ -42,6 +21,7 @@ export interface TransactionFormData {
     description: string;
     date: string;
     status: TransactionStatus;
+    recurring?: boolean;
 }
 
 type FilterType = "ALL" | TransactionType;
@@ -70,6 +50,7 @@ export default function LancamentosPage() {
         try {
             setLoading(true);
             setError(null);
+            await generateRecurringTransactions();
 
             const month = `${selectedYear}-${String(selectedMonth + 1).padStart(2, "0")}`;
 
@@ -125,6 +106,26 @@ export default function LancamentosPage() {
         loadData();
     }, [loadData]);
 
+    const generateRecurringTransactions = async () => {
+        try {
+            await fetch("/api/finance/recurrence/generate", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    year: selectedYear,
+                    month: selectedMonth,
+                }),
+            });
+        } catch (error) {
+            console.error(
+                "Erro ao gerar recorrências:",
+                error
+            );
+        }
+    };
+
     const filteredTransactions = useMemo(() => {
         const query = search.trim().toLowerCase();
 
@@ -151,7 +152,7 @@ export default function LancamentosPage() {
                     transaction.description
                         ?.toLowerCase()
                         .includes(query) ||
-                    transaction.category.name
+                    transaction.categoryId
                         .toLowerCase()
                         .includes(query)
                 );

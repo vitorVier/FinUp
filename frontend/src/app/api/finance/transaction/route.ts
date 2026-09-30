@@ -102,6 +102,7 @@ export async function POST(request: Request) {
             description,
             date,
             status,
+            recurring = false,
         } = body;
 
         const category = await prisma.transactionCategory.findFirst({
@@ -127,19 +128,48 @@ export async function POST(request: Request) {
             );
         }
 
-        const transaction = await prisma.transaction.create({
-            data: {
-                userId: session.user.id,
-                categoryId,
-                type,
-                value: String(value),
-                description: description || null,
-                date: new Date(`${date}T00:00:00`),
-                status,
-            },
-            include: {
-                category: true,
-            },
+        const transaction = await prisma.$transaction(async (tx) => {
+            let recurrencyId: string | undefined;
+
+            if (recurring) {
+                const transactionDate =
+                    new Date(`${date}T00:00:00`);
+
+                const recurrence = await tx.recurrence.create({
+                    data: {
+                        userId: session.user.id,
+                        name: String(
+                            description || category.name
+                        ).trim(),
+                        value: String(value),
+                        type,
+                        categoryId,
+                        day: transactionDate.getDate(),
+                    },
+                });
+
+                recurrencyId = recurrence.id;
+            }
+
+            return tx.transaction.create({
+                data: {
+                    userId: session.user.id,
+                    categoryId,
+                    type,
+                    value: String(value),
+                    description: description || null,
+                    date: new Date(`${date}T00:00:00`),
+                    status,
+
+                    ...(recurrencyId && {
+                        recurrencyId,
+                    }),
+                },
+
+                include: {
+                    category: true,
+                },
+            });
         });
 
         return NextResponse.json(transaction, { status: 201 });
