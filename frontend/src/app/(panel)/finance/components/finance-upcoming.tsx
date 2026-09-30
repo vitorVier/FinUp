@@ -37,10 +37,10 @@ import {
 } from "@/src/components/ui/card";
 
 import {
-    formatCurrency,
     formatDate,
     isOverdue,
 } from "../utils";
+import { formatBRL } from "@/src/lib/utils";
 
 import type { Transaction } from "../types";
 
@@ -167,7 +167,7 @@ export function FinanceUpcoming({
                                     <div className="flex shrink-0 items-center gap-2">
                                         <div className="text-right">
                                             <p className="text-sm font-semibold">
-                                                {formatCurrency(Number(transaction.value))}
+                                                {formatBRL(Number(transaction.value))}
                                             </p>
 
                                             {overdue && (

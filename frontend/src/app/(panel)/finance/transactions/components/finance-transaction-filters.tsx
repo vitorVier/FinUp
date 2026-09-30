@@ -13,8 +13,8 @@ import {
 } from "lucide-react";
 
 import { Input } from "@/src/components/ui/input";
-
 import { Button } from "@/src/components/ui/button";
+import { FinanceMonthSelector } from "../../components/finance-month-selector";
 
 import {
     Select,
@@ -25,7 +25,6 @@ import {
 } from "@/src/components/ui/select";
 
 import type {
-    TransactionCategory,
     TransactionStatus,
     TransactionType,
 } from "../page";
@@ -38,6 +37,7 @@ import {
     DialogTitle,
     DialogDescription
 } from "@/src/components/ui/dialog";
+import { TransactionCategory } from "../../types";
 
 type FilterType = "ALL" | TransactionType;
 type FilterStatus = "ALL" | TransactionStatus;
@@ -60,6 +60,10 @@ interface Props {
     onCategoriesChange: (
         categories: TransactionCategory[]
     ) => void;
+
+    year: number;
+    month: number;
+    onDateChange: (year: number, month: number) => void;
 }
 
 export function FinanceTransactionFilters({
@@ -73,6 +77,9 @@ export function FinanceTransactionFilters({
     onCategoryChange,
     categories,
     onCategoriesChange,
+    year,
+    month,
+    onDateChange,
 }: Props) {
     const [manageCategoriesOpen, setManageCategoriesOpen] = useState(false);
     const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
@@ -268,17 +275,25 @@ export function FinanceTransactionFilters({
                     </div>
                 </div>
 
-                {hasFilters && (
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={clearFilters}
-                        className="h-8 w-fit gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-                    >
-                        <X className="h-3.5 w-3.5" />
-                        Limpar filtros
-                    </Button>
-                )}
+                <div className="flex items-center gap-3">
+                    <FinanceMonthSelector
+                        year={year}
+                        month={month}
+                        onChange={onDateChange}
+                    />
+
+                    {hasFilters && (
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={clearFilters}
+                            className="h-8 w-fit gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+                        >
+                            <X className="h-3.5 w-3.5" />
+                            Limpar filtros
+                        </Button>
+                    )}
+                </div>
             </div>
 
             <div className="flex flex-col gap-3 p-4 lg:flex-row lg:items-center">

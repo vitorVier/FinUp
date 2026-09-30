@@ -11,7 +11,7 @@ import {
     CardTitle,
 } from "@/src/components/ui/card";
 
-import { formatCurrency } from "../utils";
+import { formatBRL } from "@/src/lib/utils";
 
 interface FinanceFlowCardProps {
     type: "inflow" | "outflow";
@@ -82,7 +82,7 @@ export function FinanceFlowCard({
                 <div className="flex items-end justify-between gap-3">
                     <div>
                         <p className={`text-2xl font-bold tracking-tight ${color}`}>
-                            {formatCurrency(realized)}
+                            {formatBRL(realized)}
                         </p>
 
                         <p className="mt-1 text-xs text-muted-foreground">
@@ -92,7 +92,7 @@ export function FinanceFlowCard({
 
                     <div className="text-right">
                         <p className="text-sm font-semibold text-foreground">
-                            {formatCurrency(total)}
+                            {formatBRL(total)}
                         </p>
 
                         <p className="mt-1 text-xs text-muted-foreground">
@@ -132,7 +132,7 @@ export function FinanceFlowCard({
                     </div>
 
                     <span className="text-sm font-semibold">
-                        {formatCurrency(projected)}
+                        {formatBRL(projected)}
                     </span>
                 </div>
             </CardContent>

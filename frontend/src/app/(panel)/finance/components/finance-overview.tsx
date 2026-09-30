@@ -20,10 +20,10 @@ import { FinanceExpenseChart } from "./finance-expense-chart";
 import type { Transaction } from "../types";
 
 import {
-    formatCurrency,
     isSameMonth,
     toNumber,
 } from "../utils";
+import { formatBRL } from "@/src/lib/utils";
 
 export function FinanceOverview() {
     const now = new Date();
@@ -372,7 +372,7 @@ export function FinanceOverview() {
                                 </div>
 
                                 <span className="text-lg font-bold">
-                                    {formatCurrency(
+                                    {formatBRL(
                                         totalInflows
                                     )}
                                 </span>
@@ -398,7 +398,7 @@ export function FinanceOverview() {
                                 </div>
 
                                 <span className="text-lg font-bold">
-                                    {formatCurrency(
+                                    {formatBRL(
                                         totalOutflows
                                     )}
                                 </span>

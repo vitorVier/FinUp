@@ -353,6 +353,12 @@ export default function LancamentosPage() {
                     onCategoryChange={setFilterCategory}
                     categories={categories}
                     onCategoriesChange={setCategories}
+                    year={selectedYear}
+                    month={selectedMonth}
+                    onDateChange={(year, month) => {
+                        setSelectedYear(year);
+                        setSelectedMonth(month);
+                    }}
                 />
             </section>
 

@@ -39,7 +39,7 @@ import type {
     TransactionType,
 } from "../../types";
 import { TransactionFormData } from "../page";
-import { toNumber } from "../../utils";
+import { formatInputCurrency, toNumber } from "../../utils";
 
 interface Props {
     open: boolean;
@@ -209,21 +209,6 @@ export function FinanceTransactionDialog({
             setCreatingCategory(false);
         }
     };
-
-    function formatInputCurrency(value: string): string {
-        const digits = value.replace(/\D/g, "");
-
-        if (!digits) {
-            return "0,00";
-        }
-
-        const number = Number(digits) / 100;
-
-        return number.toLocaleString("pt-BR", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        });
-    }
 
     function parseInputCurrency(value: string): string {
         const digits = value.replace(/\D/g, "");

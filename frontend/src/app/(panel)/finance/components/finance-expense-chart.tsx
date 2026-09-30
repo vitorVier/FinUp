@@ -15,10 +15,8 @@ import {
     CardTitle,
 } from "@/src/components/ui/card";
 
-import {
-    formatCurrency,
-    toNumber,
-} from "../utils";
+import { toNumber } from "../utils";
+import { formatBRL } from "@/src/lib/utils";
 
 import type { Transaction } from "../types";
 
@@ -144,7 +142,7 @@ export function FinanceExpenseChart({
 
                                     <Tooltip
                                         formatter={(value) =>
-                                            formatCurrency(
+                                            formatBRL(
                                                 Number(value)
                                             )
                                         }
@@ -164,7 +162,7 @@ export function FinanceExpenseChart({
                                 </span>
 
                                 <span className="mt-1 text-lg font-bold tracking-tight">
-                                    {formatCurrency(total)}
+                                    {formatBRL(total)}
                                 </span>
 
                                 <span className="mt-0.5 text-[10px] text-muted-foreground">
@@ -210,7 +208,7 @@ export function FinanceExpenseChart({
 
                                         <div className="mt-1.5 flex justify-between pl-[18px]">
                                             <span className="text-[10px] text-muted-foreground">
-                                                {formatCurrency(
+                                                {formatBRL(
                                                     item.value
                                                 )}
                                             </span>

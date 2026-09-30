@@ -15,14 +15,6 @@ export function toNumber(
         : 0;
 }
 
-export function formatCurrency(
-    value: number
-) {
-    return new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-    }).format(value);
-}
 
 export function formatDate(date: string) {
     const current = new Date(date);
@@ -32,6 +24,22 @@ export function formatDate(date: string) {
         month: "2-digit",
     }).format(current);
 }
+
+export function formatInputCurrency(value: string): string {
+    const digits = value.replace(/\D/g, "");
+
+    if (!digits) {
+        return "0,00";
+    }
+
+    const number = Number(digits) / 100;
+
+    return number.toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    });
+}
+
 
 export function isSameMonth(
     date: string,

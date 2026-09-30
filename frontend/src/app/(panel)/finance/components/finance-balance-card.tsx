@@ -11,7 +11,7 @@ import {
     CardTitle,
 } from "@/src/components/ui/card";
 
-import { formatCurrency } from "../utils";
+import { formatBRL } from "@/src/lib/utils";
 
 interface FinanceBalanceCardProps {
     realized: number;
@@ -52,7 +52,7 @@ export function FinanceBalanceCard({
                             : "text-red-300"
                         }`}
                 >
-                    {formatCurrency(realized)}
+                    {formatBRL(realized)}
                 </p>
 
                 <div className="mt-2 flex items-center gap-1.5 text-xs text-white/60">
@@ -78,7 +78,7 @@ export function FinanceBalanceCard({
                                         : "text-red-300"
                                     }`}
                             >
-                                {formatCurrency(projected)}
+                                {formatBRL(projected)}
                             </p>
                         </div>
 
