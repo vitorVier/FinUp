@@ -29,11 +29,19 @@ export default function MetasPage() {
     const [status, setStatus] = useState<"ALL" | GoalStatus>("ALL");
     const [type, setType] = useState<"ALL" | GoalType>("ALL");
     const [priority, setPriority] = useState<"ALL" | GoalPriority>("ALL");
+    const [sortBy, setSortBy] = useState<
+        "PRIORITY_DESC" | "PRIORITY_ASC" | "PROGRESS_DESC" | "PROGRESS_ASC"
+    >("PRIORITY_DESC");
     const [dialogOpen, setDialogOpen] = useState(false);
     const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
 
     const filteredGoals = useMemo(() => {
         const query = search.trim().toLowerCase();
+        const priorityOrder: Record<GoalPriority, number> = {
+            HIGH: 3,
+            MEDIUM: 2,
+            LOW: 1,
+        };
 
         return goals
             .filter((goal) => status === "ALL" || goal.status === status)
@@ -41,13 +49,36 @@ export default function MetasPage() {
             .filter((goal) => priority === "ALL" || goal.priority === priority)
             .filter((goal) => {
                 if (!query) return true;
+
                 return (
                     goal.name.toLowerCase().includes(query) ||
                     goal.description?.toLowerCase().includes(query) ||
                     GOAL_TYPE_LABEL[goal.type].toLowerCase().includes(query)
                 );
+            })
+            .sort((a, b) => {
+                if (sortBy.startsWith("PRIORITY")) {
+                    const diff =
+                        priorityOrder[b.priority] - priorityOrder[a.priority];
+
+                    return sortBy === "PRIORITY_DESC" ? diff : -diff;
+                }
+
+                const progressA =
+                    Number(a.targetValue) > 0
+                        ? (Number(a.currentValue) / Number(a.targetValue)) * 100
+                        : 0;
+
+                const progressB =
+                    Number(b.targetValue) > 0
+                        ? (Number(b.currentValue) / Number(b.targetValue)) * 100
+                        : 0;
+
+                const diff = progressB - progressA;
+
+                return sortBy === "PROGRESS_DESC" ? diff : -diff;
             });
-    }, [goals, search, status, type, priority]);
+    }, [goals, search, status, type, priority, sortBy]);
 
     const handleCreate = () => {
         setEditingGoal(null);
@@ -120,7 +151,7 @@ export default function MetasPage() {
                     )}
                 </div>
 
-                <div className="grid gap-3 border-b border-border p-4 lg:grid-cols-[minmax(260px,1fr)_170px_190px_170px]">
+                <div className="grid gap-3 border-b border-border p-4 lg:grid-cols-[minmax(260px,1fr)_160px_180px_160px_220px]">
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                         <Input
@@ -132,7 +163,7 @@ export default function MetasPage() {
                     </div>
 
                     <Select value={status} onValueChange={(value) => setStatus(value as typeof status)}>
-                        <SelectTrigger className="h-10 rounded-lg"><SelectValue placeholder="Status" /></SelectTrigger>
+                        <SelectTrigger className="h-10 rounded-lg text-xs"><SelectValue placeholder="Status" /></SelectTrigger>
                         <SelectContent>
                             <SelectItem value="ALL">Todos os status</SelectItem>
                             {Object.entries(GOAL_STATUS_LABEL).map(([value, label]) => (
@@ -142,7 +173,7 @@ export default function MetasPage() {
                     </Select>
 
                     <Select value={type} onValueChange={(value) => setType(value as typeof type)}>
-                        <SelectTrigger className="h-10 rounded-lg"><SelectValue placeholder="Tipo" /></SelectTrigger>
+                        <SelectTrigger className="h-10 rounded-lg text-xs"><SelectValue placeholder="Tipo" /></SelectTrigger>
                         <SelectContent>
                             <SelectItem value="ALL">Todos os tipos</SelectItem>
                             {Object.entries(GOAL_TYPE_LABEL).map(([value, label]) => (
@@ -152,12 +183,41 @@ export default function MetasPage() {
                     </Select>
 
                     <Select value={priority} onValueChange={(value) => setPriority(value as typeof priority)}>
-                        <SelectTrigger className="h-10 rounded-lg"><SelectValue placeholder="Prioridade" /></SelectTrigger>
+                        <SelectTrigger className="h-10 rounded-lg text-xs"><SelectValue placeholder="Prioridade" /></SelectTrigger>
                         <SelectContent>
                             <SelectItem value="ALL">Todas as prioridades</SelectItem>
                             {Object.entries(GOAL_PRIORITY_LABEL).map(([value, label]) => (
                                 <SelectItem key={value} value={value}>{label}</SelectItem>
                             ))}
+                        </SelectContent>
+                    </Select>
+
+                    <Select
+                        value={sortBy}
+                        onValueChange={(value) =>
+                            setSortBy(value as typeof sortBy)
+                        }
+                    >
+                        <SelectTrigger className="h-10 rounded-lg text-xs">
+                            <SelectValue placeholder="Ordenar por" />
+                        </SelectTrigger>
+
+                        <SelectContent className="text-xs">
+                            <SelectItem value="PRIORITY_DESC" className="flex gap-5 text-xs">
+                                Prioridade: Alta primeiro
+                            </SelectItem>
+
+                            <SelectItem value="PRIORITY_ASC" className="text-xs flex gap-4">
+                                Prioridade: Baixa primeiro
+                            </SelectItem>
+
+                            <SelectItem value="PROGRESS_DESC" className="text-xs flex gap-4 ">
+                                Progresso: Maior primeiro
+                            </SelectItem>
+
+                            <SelectItem value="PROGRESS_ASC" className="text-xs flex gap-4">
+                                Progresso: Menor primeiro
+                            </SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
