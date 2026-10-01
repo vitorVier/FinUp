@@ -20,6 +20,7 @@ export interface Transaction {
     value: number | string;
     description?: string | null;
     date: string;
+    paidAt?: string | null;
     status: TransactionStatus;
     type: TransactionType;
     category: TransactionCategory;

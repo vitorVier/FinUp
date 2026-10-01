@@ -20,6 +20,7 @@ export interface TransactionFormData {
     value: string;
     description: string;
     date: string;
+    paidAt?: string | null;
     status: TransactionStatus;
     recurring?: boolean;
 }
@@ -108,7 +109,7 @@ export default function LancamentosPage() {
 
     const generateRecurringTransactions = async () => {
         try {
-            await fetch("/api/finance/recurrence/generate", {
+            await fetch("/api/finance/recurrency/generate", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -156,12 +157,7 @@ export default function LancamentosPage() {
                         .toLowerCase()
                         .includes(query)
                 );
-            })
-            .sort(
-                (a, b) =>
-                    new Date(b.date).getTime() -
-                    new Date(a.date).getTime()
-            );
+            });
     }, [
         transactions,
         filterType,
@@ -272,6 +268,11 @@ export default function LancamentosPage() {
         status: TransactionStatus
     ) => {
         try {
+            const payload: any = { status };
+            if (status === "CONFIRMED") {
+                payload.paidAt = new Date().toISOString().split("T")[0];
+            }
+
             const response = await fetch(
                 `/api/finance/transaction/${transaction.id}`,
                 {
@@ -279,7 +280,7 @@ export default function LancamentosPage() {
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ status }),
+                    body: JSON.stringify(payload),
                 }
             );
 

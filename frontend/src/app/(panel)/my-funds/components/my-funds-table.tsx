@@ -1,6 +1,16 @@
 "use client";
 
-import { Eye, EyeOff, Sparkles, Star, TrendingUp } from "lucide-react";
+import { useState } from "react";
+import {
+    Eye,
+    EyeOff,
+    Sparkles,
+    Star,
+    TrendingUp,
+    ArrowUpDown,
+    ArrowUp,
+    ArrowDown,
+} from "lucide-react";
 
 import { RecommendationBadge } from "@/src/components/fii/recommendation-badge";
 import { formatPct } from "@/src/lib/utils";
@@ -23,6 +33,8 @@ interface MyFundsTableProps {
     ) => void;
 }
 
+type SortKey = keyof Fund;
+
 // Chip pequeno, ao lado do ticker — mesma ideia visual do
 // RecommendationBadge, cores diferentes pra não confundir com recomendação.
 function MudancaBadge({ status }: { status: StatusMudanca }) {
@@ -42,6 +54,13 @@ function MudancaBadge({ status }: { status: StatusMudanca }) {
     );
 }
 
+function SortIcon({ active, desc }: { active: boolean; desc: boolean }) {
+    if (!active) return <ArrowUpDown className="h-3 w-3 opacity-40" />;
+    return desc
+        ? <ArrowDown className="h-3 w-3" />
+        : <ArrowUp className="h-3 w-3" />;
+}
+
 export function MyFundsTable({
     funds,
     walletTickers,
@@ -51,19 +70,49 @@ export function MyFundsTable({
     onSelect,
     onToggle,
 }: MyFundsTableProps) {
+    const [sort, setSort] = useState<SortKey>("Rank");
+    const [desc, setDesc] = useState(false);
+
+    const toggle = (key: SortKey) => {
+        if (sort === key) setDesc((d) => !d);
+        else {
+            setSort(key);
+            setDesc(false);
+        }
+    };
+
+    const sorted = [...funds].sort((a, b) => {
+        const av = a[sort] as any;
+        const bv = b[sort] as any;
+        return (av > bv ? 1 : av < bv ? -1 : 0) * (desc ? -1 : 1);
+    });
+
+    const columns: { key: SortKey; label: string }[] = [
+        { key: "Papel", label: "Fundo" },
+        { key: "Segmento", label: "Segmento" },
+        { key: "Dividend Yield", label: "DY" },
+        { key: "P/VP", label: "P/VP" },
+        { key: "Nota_Final", label: "Nota" },
+        { key: "Recomendacao", label: "Recomendação" },
+    ];
+
     return (
         <div className="scrollbar w-full overflow-x-auto">
             <table className="w-full text-sm border-collapse border-spacing-0">
                 <thead>
                     <tr className="border-b bg-muted/30 text-left text-xs text-muted-foreground">
-                        <th className="px-5 py-3 font-medium">Fundo</th>
-                        <th className="px-4 py-3 font-medium">Segmento</th>
-                        <th className="px-4 py-3 font-medium">DY</th>
-                        <th className="px-4 py-3 font-medium">P/VP</th>
-                        <th className="px-4 py-3 font-medium">Nota</th>
-                        <th className="px-4 py-3 font-medium">
-                            Recomendação
-                        </th>
+                        {columns.map(({ key, label }) => (
+                            <th key={key} className="px-4 py-3 font-medium">
+                                <button
+                                    type="button"
+                                    onClick={() => toggle(key)}
+                                    className="inline-flex items-center gap-1 font-semibold hover:text-foreground transition-colors"
+                                >
+                                    {label}
+                                    <SortIcon active={sort === key} desc={desc} />
+                                </button>
+                            </th>
+                        ))}
                         <th className="w-[120px] px-4 py-3 text-right font-medium">
                             Ações
                         </th>
@@ -71,7 +120,7 @@ export function MyFundsTable({
                 </thead>
 
                 <tbody>
-                    {funds.map((fund) => {
+                    {sorted.map((fund) => {
                         const inWallet = walletTickers.has(fund.Papel);
                         const inWatchlist = watchlistTickers.has(fund.Papel);
                         const mudanca = mudancas[fund.Papel];
@@ -83,10 +132,10 @@ export function MyFundsTable({
                                 className="w-full cursor-pointer border-b border-border last:border-0 hover:bg-secondary/40 group/row"
                                 style={{
                                     animation: "fadeSlideIn 200ms ease both",
-                                    animationDelay: `${funds.indexOf(fund) * 30}ms`,
+                                    animationDelay: `${sorted.indexOf(fund) * 30}ms`,
                                 }}
                             >
-                                <td className="px-5 py-4 border-b border-border group-last/row:border-0">
+                                <td className="px-4 py-4 border-b border-border group-last/row:border-0">
                                     <div>
                                         <div className="flex items-center gap-2">
                                             <p className="font-semibold">

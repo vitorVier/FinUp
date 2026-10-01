@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
     Check,
     MoreHorizontal,
@@ -8,6 +9,9 @@ import {
     ArrowDownLeft,
     ArrowUpRight,
     Repeat,
+    ArrowUpDown,
+    ArrowUp,
+    ArrowDown,
 } from "lucide-react";
 
 import {
@@ -42,6 +46,8 @@ interface Props {
     ) => void;
 }
 
+type SortKey = "date" | "description" | "category" | "type" | "value" | "paidAt" | "status";
+
 function formatBRL(value: string | number) {
     return Number(value).toLocaleString("pt-BR", {
         style: "currency",
@@ -70,49 +76,110 @@ function isToday(date: string) {
     );
 }
 
+function SortIcon({ active, desc }: { active: boolean; desc: boolean }) {
+    if (!active) return <ArrowUpDown className="h-3 w-3 opacity-40" />;
+    return desc
+        ? <ArrowDown className="h-3 w-3" />
+        : <ArrowUp className="h-3 w-3" />;
+}
+
+function getSortValue(transaction: Transaction, key: SortKey): string | number {
+    switch (key) {
+        case "date":
+            return transaction.date;
+        case "description":
+            return (transaction.description || "").toLowerCase();
+        case "category":
+            return transaction.category.name.toLowerCase();
+        case "type":
+            return transaction.type;
+        case "value":
+            return Number(transaction.value);
+        case "paidAt":
+            return transaction.paidAt ?? "";
+        case "status":
+            return transaction.status;
+        default:
+            return "";
+    }
+}
+
 export function FinanceTransactionTable({
     transactions,
     onEdit,
     onDelete,
     onStatusChange,
 }: Props) {
+    const [sort, setSort] = useState<SortKey>("date");
+    const [desc, setDesc] = useState(true);
+
+    const toggle = (key: SortKey) => {
+        if (sort === key) setDesc((d) => !d);
+        else {
+            setSort(key);
+            setDesc(false);
+        }
+    };
+
+    const sorted = [...transactions].sort((a, b) => {
+        const av = getSortValue(a, sort);
+        const bv = getSortValue(b, sort);
+        return (av > bv ? 1 : av < bv ? -1 : 0) * (desc ? -1 : 1);
+    });
+
+    function ColHeader({
+        label,
+        sortKey,
+        className = "",
+    }: {
+        label: string;
+        sortKey: SortKey;
+        className?: string;
+    }) {
+        const active = sort === sortKey;
+        return (
+            <th className={`px-4 py-3.5 font-semibold ${className}`}>
+                <button
+                    type="button"
+                    onClick={() => toggle(sortKey)}
+                    className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
+                >
+                    {label}
+                    <SortIcon active={active} desc={desc} />
+                </button>
+            </th>
+        );
+    }
+
     return (
         <Card className="overflow-hidden border-border shadow-sm">
             <CardContent className="!p-0">
                 <div className="w-full overflow-x-auto">
-                    <table className="w-full min-w-[900px] table-fixed text-sm">
+                    <table className="w-full min-w-[1000px] table-fixed text-sm">
                         <thead>
                             <tr className="border-b bg-muted/30 text-left text-[11px] uppercase tracking-wide text-muted-foreground">
-                                <th className="px-5 py-3.5 font-semibold">
-                                    Data
-                                </th>
-
-                                <th className="px-4 py-3.5 font-semibold">
-                                    Lançamento
-                                </th>
-
-                                <th className="px-4 py-3.5 font-semibold">
-                                    Categoria
-                                </th>
-
-                                <th className="px-4 py-3.5 font-semibold">
-                                    Tipo
-                                </th>
-
+                                <ColHeader label="Data" sortKey="date" className="px-5" />
+                                <ColHeader label="Lançamento" sortKey="description" />
+                                <ColHeader label="Categoria" sortKey="category" />
+                                <ColHeader label="Tipo" sortKey="type" />
                                 <th className="px-4 py-3.5 text-right font-semibold">
-                                    Valor
+                                    <button
+                                        type="button"
+                                        onClick={() => toggle("value")}
+                                        className="inline-flex items-center gap-1 hover:text-foreground transition-colors ml-auto"
+                                    >
+                                        Valor
+                                        <SortIcon active={sort === "value"} desc={desc} />
+                                    </button>
                                 </th>
-
-                                <th className="px-4 py-3.5 font-semibold">
-                                    Status
-                                </th>
-
+                                <ColHeader label="Pago em" sortKey="paidAt" />
+                                <ColHeader label="Status" sortKey="status" />
                                 <th className="w-[64px] px-4 py-3.5" />
                             </tr>
                         </thead>
 
                         <tbody>
-                            {transactions.map((transaction) => {
+                            {sorted.map((transaction) => {
                                 const isInflow =
                                     transaction.type === "INFLOW";
 
@@ -230,6 +297,12 @@ export function FinanceTransactionTable({
                                         </td>
 
                                         <td className="px-4 py-4">
+                                            <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">
+                                                {transaction.paidAt ? formatDate(transaction.paidAt) : "-"}
+                                            </span>
+                                        </td>
+
+                                        <td className="px-4 py-4">
                                             <FinanceTransactionStatus
                                                 status={
                                                     transaction.status
@@ -304,7 +377,7 @@ export function FinanceTransactionTable({
                     </span>
 
                     <span className="hidden text-[11px] text-muted-foreground sm:block">
-                        Clique em ⋯ para mais ações
+                        Clique no cabeçalho para ordenar
                     </span>
                 </div>
             </CardContent>

@@ -68,6 +68,7 @@ export function FinanceTransactionDialog({
     const [value, setValue] = useState("");
     const [description, setDescription] = useState("");
     const [date, setDate] = useState(today());
+    const [paidAt, setPaidAt] = useState<string | null>(null);
 
     const [status, setStatus] = useState<TransactionStatus>("PENDING");
     const [isRecurring, setIsRecurring] = useState(false);
@@ -96,6 +97,7 @@ export function FinanceTransactionDialog({
             );
             setDescription(transaction.description ?? "");
             setDate(transaction.date.slice(0, 10));
+            setPaidAt(transaction.paidAt ? transaction.paidAt.slice(0, 10) : null);
             setStatus(transaction.status);
             setIsRecurring(false);
         } else {
@@ -104,6 +106,7 @@ export function FinanceTransactionDialog({
             setValue("");
             setDescription("");
             setDate(today());
+            setPaidAt(null);
             setStatus("PENDING");
             setIsRecurring(false);
         }
@@ -135,6 +138,7 @@ export function FinanceTransactionDialog({
                 value: parseInputCurrency(value),
                 description,
                 date,
+                paidAt: status === "CONFIRMED" ? (paidAt || today()) : null,
                 status,
                 recurring: isRecurring,
             });
@@ -415,11 +419,12 @@ export function FinanceTransactionDialog({
 
                                     <Select
                                         value={status}
-                                        onValueChange={(value) =>
-                                            setStatus(
-                                                value as TransactionStatus
-                                            )
-                                        }
+                                        onValueChange={(value) => {
+                                            setStatus(value as TransactionStatus);
+                                            if (value === "CONFIRMED" && !paidAt) {
+                                                setPaidAt(today());
+                                            }
+                                        }}
                                     >
                                         <SelectTrigger className="h-10 w-full rounded-lg">
                                             <SelectValue />
@@ -441,6 +446,28 @@ export function FinanceTransactionDialog({
                                     </Select>
                                 </div>
                             </div>
+
+                            {/* DATA PAGAMENTO (condicional) */}
+                            {status === "CONFIRMED" && (
+                                <div className="space-y-2">
+                                    <label className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+                                        <CalendarDays className="h-3.5 w-3.5" />
+                                        Data do pagamento
+                                    </label>
+
+                                    <Input
+                                        type="date"
+                                        value={paidAt || ""}
+                                        onChange={(event) =>
+                                            setPaidAt(
+                                                event.target.value
+                                            )
+                                        }
+                                        required
+                                        className="h-11 rounded-lg"
+                                    />
+                                </div>
+                            )}
 
                             {/* RECORRÊNCIA */}
                             {!transaction ? (
@@ -494,13 +521,41 @@ export function FinanceTransactionDialog({
                                         }
                                     ).recurrencyId
                                 ) && (
-                                    <div className="flex items-start gap-2.5 rounded-xl border border-border/70 bg-muted/20 px-3.5 py-3 text-[11px] leading-relaxed text-muted-foreground">
-                                        <Repeat className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#053032]" />
-
-                                        <span>
-                                            Este lançamento pertence a uma recorrência.
-                                            Alterações aqui afetam apenas este lançamento.
-                                        </span>
+                                    <div className="flex flex-col gap-3 rounded-xl border border-border/70 bg-muted/20 px-3.5 py-3 text-[11px] leading-relaxed text-muted-foreground">
+                                        <div className="flex items-start gap-2.5">
+                                            <Repeat className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#053032]" />
+                                            <span>
+                                                Este lançamento pertence a uma recorrência.
+                                                Alterações aqui afetam apenas este lançamento.
+                                            </span>
+                                        </div>
+                                        <Button
+                                            type="button"
+                                            variant="destructive"
+                                            size="sm"
+                                            onClick={async () => {
+                                                const recurrencyId = (transaction as Transaction & { recurrencyId?: string | null }).recurrencyId;
+                                                if (!recurrencyId) return;
+                                                
+                                                if (!window.confirm("Deseja encerrar a geração automática desta conta para os próximos meses? Os lançamentos já gerados não serão alterados.")) return;
+                                                
+                                                try {
+                                                    setSaving(true);
+                                                    const res = await fetch(`/api/finance/recurrency/${recurrencyId}`, { method: "DELETE" });
+                                                    if (!res.ok) throw new Error();
+                                                    toast.success("Recorrência encerrada com sucesso!");
+                                                    onOpenChange(false);
+                                                } catch(err) {
+                                                    toast.error("Erro ao encerrar recorrência.");
+                                                } finally {
+                                                    setSaving(false);
+                                                }
+                                            }}
+                                            disabled={saving}
+                                            className="h-8 w-fit self-end text-xs"
+                                        >
+                                            Encerrar recorrência
+                                        </Button>
                                     </div>
                                 )
                             )}

@@ -101,6 +101,7 @@ export async function POST(request: Request) {
             value,
             description,
             date,
+            paidAt,
             status,
             recurring = false,
         } = body;
@@ -160,6 +161,7 @@ export async function POST(request: Request) {
                     description: description || null,
                     date: new Date(`${date}T00:00:00`),
                     status,
+                    paidAt: paidAt ? new Date(`${paidAt}T12:00:00`) : null,
 
                     ...(recurrencyId && {
                         recurrencyId,

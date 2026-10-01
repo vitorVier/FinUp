@@ -21,7 +21,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
             );
         }
 
-        const { categoryId, value, description, date, status } = await request.json();
+        const { categoryId, value, description, date, paidAt, status } = await request.json();
         if (!status) {
             return NextResponse.json(
                 { error: "Status não informado." },
@@ -79,6 +79,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
                 ...(description !== undefined && { description: description || null }),
                 ...(date && { date: new Date(`${date}T12:00:00`) }),
                 ...(status && { status }),
+                paidAt: paidAt ? new Date(`${paidAt}T12:00:00`) : null,
             },
             include: {
                 category: true

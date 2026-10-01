@@ -105,6 +105,7 @@ model Transaction {
   value       Decimal           @db.Decimal(10, 2)
   description String?
   date        DateTime          @db.Date
+  paidAt      DateTime?         @db.Date
   status      TransactionStatus @default(PENDING)
   type        TransactionType
 
