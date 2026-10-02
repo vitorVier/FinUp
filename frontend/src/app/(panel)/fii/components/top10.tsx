@@ -1,10 +1,10 @@
 import { ArrowUpRight, BarChart3, Percent, Target } from "lucide-react";
 
 import { Card, CardContent } from "@/src/components/ui/card";
-import { RecommendationBadge } from "@/src/components/fii/recommendation-badge";
+import { RecommendationBadge } from "./recommendation-badge";
 import { formatBRL, formatPct } from "@/src/lib/utils";
 import type { Analysis, Fund } from "@/src/types";
-import { SectionTitle } from "./app-shell";
+import { SectionTitle } from "../app-shell";
 
 type SortMode = "fuzzy" | "tradicional";
 

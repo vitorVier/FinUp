@@ -39,7 +39,7 @@ import type {
     TransactionType,
 } from "../../types";
 import { TransactionFormData } from "../page";
-import { formatInputCurrency, toNumber } from "../../utils";
+import { formatInputCurrency, toNumber } from "../../utils/utils";
 
 interface Props {
     open: boolean;
@@ -536,16 +536,16 @@ export function FinanceTransactionDialog({
                                             onClick={async () => {
                                                 const recurrencyId = (transaction as Transaction & { recurrencyId?: string | null }).recurrencyId;
                                                 if (!recurrencyId) return;
-                                                
+
                                                 if (!window.confirm("Deseja encerrar a geração automática desta conta para os próximos meses? Os lançamentos já gerados não serão alterados.")) return;
-                                                
+
                                                 try {
                                                     setSaving(true);
                                                     const res = await fetch(`/api/finance/recurrency/${recurrencyId}`, { method: "DELETE" });
                                                     if (!res.ok) throw new Error();
                                                     toast.success("Recorrência encerrada com sucesso!");
                                                     onOpenChange(false);
-                                                } catch(err) {
+                                                } catch (err) {
                                                     toast.error("Erro ao encerrar recorrência.");
                                                 } finally {
                                                     setSaving(false);

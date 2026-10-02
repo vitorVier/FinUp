@@ -1,5 +1,14 @@
-import { AppShell } from "@/src/components/fii/app-shell";
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
-    return <AppShell />;
+    const router = useRouter();
+
+    useEffect(() => {
+        router.replace("/finance");
+    }, [router]);
+
+    return null;
 }

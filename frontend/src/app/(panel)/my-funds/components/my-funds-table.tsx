@@ -12,7 +12,7 @@ import {
     ArrowDown,
 } from "lucide-react";
 
-import { RecommendationBadge } from "@/src/components/fii/recommendation-badge";
+import { RecommendationBadge } from "../../fii/components/recommendation-badge";
 import { formatPct } from "@/src/lib/utils";
 
 import type { Fund } from "@/src/types";

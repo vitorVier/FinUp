@@ -39,7 +39,7 @@ import {
 import {
     formatDate,
     isOverdue,
-} from "../utils";
+} from "../utils/utils";
 import { formatBRL } from "@/src/lib/utils";
 
 import type { Transaction } from "../types";

@@ -1,7 +1,7 @@
 "use client";
 
 import { CalendarDays, Pencil, Target, Trash2, CheckCircle2 } from "lucide-react";
-import type { Goal } from "@/src/app/(panel)/finance/types";
+import type { Goal } from "@/src/app/(panel)/finance/types/goals";
 import {
     formatGoalDate,
     getGoalProgress,

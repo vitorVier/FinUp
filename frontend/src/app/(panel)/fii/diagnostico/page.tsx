@@ -1,4 +1,4 @@
-import { AppShell } from "@/src/components/fii/app-shell";
+import { AppShell } from "../app-shell";
 
 export default function DiagnosticoPage() {
     return <AppShell />;

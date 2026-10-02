@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUpDown, Eye, EyeIcon, EyeOff, Search, SlidersHorizontal, Star, StarIcon } from "lucide-react";
 import { Input } from "@/src/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select";
-import { RecommendationBadge } from "@/src/components/fii/recommendation-badge";
+import { RecommendationBadge } from "./recommendation-badge";
 import { formatPct } from "@/src/lib/utils";
 import type { Fund } from "@/src/types";
 
@@ -188,17 +188,17 @@ export function RankingTable({ funds, onSelect }: { funds: Fund[]; onSelect: (f:
                 <th key={key} className={`whitespace-nowrap py-3 ${className}`}>
                   {key !== "actions" ? (
                     <button
-                        className="inline-flex items-center gap-1 font-semibold"
-                        onClick={() => toggle(key as keyof Fund)}
+                      className="inline-flex items-center gap-1 font-semibold"
+                      onClick={() => toggle(key as keyof Fund)}
                     >
-                        {label}
-                        <ArrowUpDown className="h-3 w-3" />
+                      {label}
+                      <ArrowUpDown className="h-3 w-3" />
                     </button>
-                ) : (
+                  ) : (
                     <span className="font-semibold">
-                        {label}
+                      {label}
                     </span>
-                )}
+                  )}
                 </th>
               ))}
             </tr>

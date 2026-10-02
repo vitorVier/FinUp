@@ -1,5 +1,5 @@
 import { CircleCheck, CircleDollarSign, Flag, Target } from "lucide-react";
-import type { Goal } from "@/src/app/(panel)/finance/types";
+import type { Goal } from "@/src/app/(panel)/finance/types/goals";
 import { formatBRL } from "@/src/lib/utils";
 
 interface Props {

@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
-import { RecommendationBadge } from "@/src/components/fii/recommendation-badge";
+import { RecommendationBadge } from "./recommendation-badge";
 import { formatBRL, formatPct } from "@/src/lib/utils";
 
 import type { Analysis, Fund } from "@/src/types";
@@ -34,12 +34,8 @@ export function FundDetail({
     onClose,
     onSelect,
 }: FundDetailProps) {
-    /*
-     * ============================================================
-     * DADOS DERIVADOS
-     * ============================================================
-     */
 
+    //DADOS DERIVADOS
     const recomendacao = fund.Recomendacao;
 
     const cotacao = Number(fund.Cotação ?? 0);
@@ -66,12 +62,7 @@ export function FundDetail({
             ? (precoMedio / cotacao - 1) * 100
             : null;
 
-    /*
-     * ============================================================
-     * GRAUS FUZZY
-     * ============================================================
-     */
-
+    //GRAUS FUZZY
     const graus = [
         {
             label: "Comprar",
@@ -103,7 +94,6 @@ export function FundDetail({
         graus.some((item) => item.valor > 0);
 
     /* ALERTAS */
-
     const alertas = [
         {
             label: "DY excessivo",
@@ -127,7 +117,6 @@ export function FundDetail({
     );
 
     /* COMPARAÇÃO FUZZY × TRADICIONAL */
-
     const comparacao =
         analysis.comparacao_fuzzy_tradicional?.find(
             (item) => item.Papel === fund.Papel
@@ -157,7 +146,6 @@ export function FundDetail({
         gapDividendo > 0.02;
 
     /* HELPERS VISUAIS */
-
     function getAlertColor(valor: number) {
         if (valor >= 0.6) {
             return {
@@ -241,11 +229,9 @@ export function FundDetail({
             </div>
 
             {/* CONTEÚDO*/}
-
             <div className="overflow-y-auto px-6 py-6">
 
                 {/* VISÃO GERAL*/}
-
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                     <Metric
                         label="Cotação"

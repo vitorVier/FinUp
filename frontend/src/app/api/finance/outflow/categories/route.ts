@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import prisma from "@/src/lib/prisma";
 import { auth } from "@/src/lib/auth";
+import { generateCategoryColor } from "@/src/app/(panel)/finance/utils/utils";
 
 export async function GET() {
     try {
@@ -42,6 +43,7 @@ export async function GET() {
 export async function POST(request: Request) {
     try {
         const session = await auth();
+
         if (!session) {
             return NextResponse.json(
                 { error: "Usuário não autenticado." },
@@ -49,20 +51,44 @@ export async function POST(request: Request) {
             );
         }
 
-        const { name } = await request.json();
-        const category = await prisma.transactionCategory.create({
-            data: {
-                userId: session.user.id,
-                type: "OUTFLOW",
-                name,
-                icon: "ArrowUpRight",
-                color: "#DC2626",
-            },
-        });
+        const existingCategories =
+            await prisma.transactionCategory.findMany({
+                where: {
+                    userId: session.user.id,
+                },
+                select: {
+                    color: true,
+                },
+            });
 
-        return NextResponse.json(category, { status: 201 });
+        const color = generateCategoryColor(
+            "OUTFLOW",
+            existingCategories.map(
+                (category) => category.color
+            )
+        );
+
+        const { name } = await request.json();
+
+        const category =
+            await prisma.transactionCategory.create({
+                data: {
+                    userId: session.user.id,
+                    type: "OUTFLOW",
+                    name,
+                    icon: "ArrowUpRight",
+                    color,
+                },
+            });
+
+        return NextResponse.json(category, {
+            status: 201,
+        });
     } catch (err) {
-        console.error("ERRO AO CRIAR CATEGORIA:", err);
+        console.error(
+            "ERRO AO CRIAR CATEGORIA:",
+            err
+        );
 
         return NextResponse.json(
             {

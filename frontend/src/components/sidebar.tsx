@@ -9,11 +9,11 @@ import {
     WalletIcon,
     Menu,
     X,
-    WalletCards,
     Landmark,
     Receipt,
     PiggyBank,
     Target,
+    ClipboardCheck,
 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { Button } from "./ui/button";
@@ -21,28 +21,9 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 import logoImg from "../../public/logo.png";
+import { GoogleLoginButton } from "./google-auth";
 
 const NAV_GROUPS = [
-    {
-        label: "FII's",
-        items: [
-            {
-                href: "/",
-                label: "Análise",
-                icon: LineChartIcon,
-            },
-            {
-                href: "/diagnostico",
-                label: "Diagnóstico",
-                icon: BarChart3,
-            },
-            {
-                href: "/my-funds",
-                label: "Meus Fundos",
-                icon: WalletIcon,
-            },
-        ],
-    },
     {
         label: "Financeiro",
         items: [
@@ -65,6 +46,31 @@ const NAV_GROUPS = [
                 href: "/finance/goals",
                 label: "Metas",
                 icon: Target,
+            },
+            {
+                href: "/finance/cash-flow",
+                label: "Fluxo de Caixa",
+                icon: BarChart3,
+            }
+        ],
+    },
+    {
+        label: "FII's",
+        items: [
+            {
+                href: "/fii",
+                label: "Análise",
+                icon: LineChartIcon,
+            },
+            {
+                href: "/fii/diagnostico",
+                label: "Diagnóstico",
+                icon: ClipboardCheck,
+            },
+            {
+                href: "/fii/my-funds",
+                label: "Meus Fundos",
+                icon: WalletIcon,
             },
         ],
     },
@@ -215,22 +221,7 @@ export function Sidebar() {
                         </button>
                     </div>
                 ) : (
-                    <Button
-                        onClick={() =>
-                            (window.location.href = "/login")
-                        }
-                        className="
-                            h-10 w-full
-                            border-0
-                            bg-white
-                            text-sm font-medium
-                            text-[#052b2b]
-                            shadow-none
-                            hover:bg-white/90
-                        "
-                    >
-                        Entrar com Google
-                    </Button>
+                    <GoogleLoginButton />
                 )}
             </div>
         </div>

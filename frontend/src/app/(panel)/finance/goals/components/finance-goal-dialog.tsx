@@ -20,9 +20,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/src/components/ui/select";
-import type { Goal, GoalFormData, GoalPriority, GoalStatus, GoalType } from "@/src/app/(panel)/finance/types";
+import type { Goal, GoalFormData, GoalPriority, GoalStatus, GoalType } from "@/src/app/(panel)/finance/types/goals";
 import { GOAL_PRIORITY_LABEL, GOAL_STATUS_LABEL, GOAL_TYPE_LABEL } from "@/src/app/(panel)/finance/lib/goals";
-import { formatInputCurrency } from "../../utils";
+import { formatInputCurrency } from "../../utils/utils";
 
 interface Props {
     open: boolean;

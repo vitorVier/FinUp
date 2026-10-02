@@ -22,7 +22,7 @@ import type { Transaction } from "../types";
 import {
     isSameMonth,
     toNumber,
-} from "../utils";
+} from "../utils/utils";
 import { formatBRL } from "@/src/lib/utils";
 
 export function FinanceOverview() {

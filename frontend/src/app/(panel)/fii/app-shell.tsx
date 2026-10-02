@@ -3,9 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 
-import { SourceCard } from "@/src/components/fii/source-card";
-import { Top10 } from "@/src/components/fii/top10";
-import { RankingTable } from "@/src/components/fii/ranking-table";
+import { SourceCard } from "./components/source-card";
+import { Top10 } from "./components/top10";
+import { RankingTable } from "./components/ranking-table";
 
 import {
   Dialog,
@@ -15,8 +15,8 @@ import {
   DialogDescription,
 } from "@/src/components/ui/dialog";
 
-import { FundDetail } from "@/src/components/fii/fund-detail";
-import { Diagnostics } from "@/src/components/fii/diagnostics";
+import { FundDetail } from "./components/fund-detail";
+import { Diagnostics } from "./components/diagnostics";
 
 import type { Fund } from "@/src/types";
 import { useAnalysis } from "@/src/hooks/useAnalysis";
@@ -25,7 +25,7 @@ import { useOportunities } from "@/src/hooks/useOportunities";
 export function AppShell() {
   const pathname = usePathname();
   const page: "analise" | "diagnostico" =
-    pathname === "/diagnostico" ? "diagnostico" : "analise";
+    pathname === "/fii/diagnostico" ? "diagnostico" : "analise";
 
   const { data, updatedAt, loading, error, run, upload } = useAnalysis();
   const { sync, ack } = useOportunities();

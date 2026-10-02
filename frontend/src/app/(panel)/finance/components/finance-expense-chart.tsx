@@ -15,7 +15,7 @@ import {
     CardTitle,
 } from "@/src/components/ui/card";
 
-import { toNumber } from "../utils";
+import { toNumber, getCategoryColorByName } from "../utils/utils";
 import { formatBRL } from "@/src/lib/utils";
 
 import type { Transaction } from "../types";
@@ -47,7 +47,7 @@ export function FinanceExpenseChart({
             acc[categoryId] = {
                 name: transaction.category.name,
                 value: 0,
-                color: transaction.category.color,
+                color: getCategoryColorByName(transaction.category.name, "OUTFLOW"),
             };
         }
 
@@ -171,46 +171,39 @@ export function FinanceExpenseChart({
                             </div>
                         </div>
 
-                        <div className="space-y-3">
+                        <div className="space-y-1 overflow-y-auto pr-1 pb-1 max-h-[250px]">
                             {data.map((item) => {
                                 const percentage =
                                     total > 0
-                                        ? (item.value /
-                                            total) *
-                                        100
+                                        ? (item.value / total) * 100
                                         : 0;
 
                                 return (
                                     <div
                                         key={item.name}
-                                        className="group"
+                                        className="group relative flex items-center justify-between rounded-lg border border-transparent px-2.5 py-2 transition-all hover:bg-muted/50"
                                     >
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex min-w-0 items-center gap-3">
                                             <span
-                                                className="h-2.5 w-2.5 shrink-0 rounded-full"
+                                                className="h-3 w-3 shrink-0 rounded-full shadow-sm"
                                                 style={{
-                                                    backgroundColor:
-                                                        item.color,
+                                                    backgroundColor: item.color,
                                                 }}
                                             />
 
-                                            <span className="min-w-0 flex-1 truncate text-xs font-medium">
-                                                {item.name}
-                                            </span>
-
-                                            <span className="text-xs font-semibold">
-                                                {percentage.toFixed(
-                                                    0
-                                                )}
-                                                %
-                                            </span>
+                                            <div className="flex flex-col truncate">
+                                                <span className="truncate text-[13px] font-medium text-foreground transition-colors group-hover:text-foreground/80">
+                                                    {item.name}
+                                                </span>
+                                                <span className="text-[11px] font-medium text-muted-foreground">
+                                                    {formatBRL(item.value)}
+                                                </span>
+                                            </div>
                                         </div>
 
-                                        <div className="mt-1.5 flex justify-between pl-[18px]">
-                                            <span className="text-[10px] text-muted-foreground">
-                                                {formatBRL(
-                                                    item.value
-                                                )}
+                                        <div className="ml-3 flex shrink-0 items-center justify-end rounded-md bg-muted/40 px-2 py-1 transition-colors group-hover:bg-background shadow-sm">
+                                            <span className="text-[11px] font-bold tabular-nums text-foreground/90" style={{ color: item.color }}>
+                                                {percentage.toFixed(1)}%
                                             </span>
                                         </div>
                                     </div>
